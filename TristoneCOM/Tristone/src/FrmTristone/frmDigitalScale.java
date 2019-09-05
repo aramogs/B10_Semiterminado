@@ -238,10 +238,10 @@ public class frmDigitalScale extends javax.swing.JFrame {
         lblCount.setText("00");
         lblCount.setName("jlblEmployee"); // NOI18N
         lblCount.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
             public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
                 lblCountInputMethodTextChanged(evt);
-            }
-            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
         });
         lblCount.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
@@ -416,7 +416,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
         // TODO add your handling code here:
         if(!decInt){
             int inputSP= Integer.parseInt(lblCount.getText());
-            if(inputSP == stdPack){
+            if(inputSP > 0 && inputSP <= stdPack){ //9/05/2019 Ciscomar
                 jtxtConfirm.setEnabled(true);
                 //jtxtConfirm.setVisible(true);
 
@@ -427,7 +427,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
             }
         }else{
             double inputSP= Double.parseDouble(lblCount.getText());
-            if(inputSP == _stdPack){
+            if(inputSP > 0 && inputSP <= _stdPack){ //9/05/2019 Ciscomar
                 jtxtConfirm.setEnabled(true);
                 //jtxtConfirm.setVisible(true);
 
@@ -470,7 +470,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
         //true si es decimal
         if(!decInt){
              int inputSP = Integer.parseInt(lblCount.getText());
-            if(inputSP == stdPack){
+            if(inputSP > 0 && inputSP <= stdPack){ //9/05/2019 Ciscomar
                 jlblConfirm.setVisible(true);
                 jtxtConfirm.setVisible(true);
                 jtxtConfirm.setEnabled(true);
@@ -485,7 +485,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
                 jtxtStdarPack.setText(lblCount.getText()+"/"+ stdPack);
         }else{
              double inputSP = Double.parseDouble(lblCount.getText());
-            if(inputSP == _stdPack){
+            if(inputSP > 0 && inputSP <= _stdPack){ //9/05/2019 Ciscomar
                 jlblConfirm.setVisible(true);
                 jtxtConfirm.setVisible(true);
                 jtxtConfirm.setEnabled(true);
@@ -517,7 +517,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
                  } else{
                     if(code.equals(_confirmCode)){
                         jtxtConfirm.setEnabled(false);
-                        Send();
+                        Send(lblCount.getText()); //9/05/2019 Ciscomar
                     }
                 }
             } catch (Exception ex) {
@@ -789,7 +789,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
         
     }
         
-    private void Send() {   
+    private void Send(String qty) {   // 09-05-2019 Ciscomar   
         String routingKey="";
         StationEntity _stationEntity = new StationEntity();
         StationModel objStationModel =new StationModel();
@@ -815,7 +815,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
             Gson gson = new Gson();
 
             
-            String message = gson.toJson(GetDataSendEntity());
+            String message = gson.toJson(GetDataSendEntity(qty)); // 09-05-2019 Ciscomar
             
              routingKey = "s"+ _station;
            
@@ -889,7 +889,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
         }
     }
     
-    private SendJsonEntity GetDataSendEntity(){
+    private SendJsonEntity GetDataSendEntity(String qty){ // 09-05-2019 Ciscomar
         SendJsonEntity _sendJsonEntity=new SendJsonEntity();     
        
         
@@ -937,7 +937,8 @@ public class frmDigitalScale extends javax.swing.JFrame {
 //                    if(decInt)
 //                        _sendJsonEntity.setPckd(Double.parseDouble(_ProductsEntity.getPcks()));
 //                    else
-                        _sendJsonEntity.setPckd(_ProductsEntity.getPcks());
+                       _sendJsonEntity.setPckd(qty); // 09-05-2019 Ciscomar
+                    //_sendJsonEntity.setPckd(_ProductsEntity.getPcks()); // 09-05-2019 Ciscomar
                     //_printEntity.setImpresora(_stationEntity.getImpre());
                     //_printEntity.setFecha(dtf.format(now));
                     //_printEntity.setnVali("");
