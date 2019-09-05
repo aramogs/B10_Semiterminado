@@ -1,7 +1,7 @@
-localhost
+10.56.98.3
 b10
 root
-
+toor
 400
 2513
 123

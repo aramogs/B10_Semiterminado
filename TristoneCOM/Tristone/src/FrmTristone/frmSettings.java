@@ -197,7 +197,6 @@ public class frmSettings extends javax.swing.JFrame {
         jtxtSubStation = new javax.swing.JTextField();
         lbl2 = new javax.swing.JLabel();
 
-        setMaximumSize(new java.awt.Dimension(800, 480));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -213,28 +212,28 @@ public class frmSettings extends javax.swing.JFrame {
 
         jLabel5.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel5.setText("Server");
+        jLabel5.setText("MySQL Server");
 
         jtxtDB.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jtxtDB.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         jLabel7.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel7.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel7.setText("DataBase");
+        jLabel7.setText("DataBase Name");
 
         jtxtUser.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jtxtUser.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         jLabel8.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel8.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel8.setText("User");
+        jLabel8.setText("DataBase User");
 
         jtxtPass.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jtxtPass.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
         jLabel9.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel9.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel9.setText("Password");
+        jLabel9.setText("Inner Password");
 
         jtxtNoStation.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jtxtNoStation.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -248,7 +247,7 @@ public class frmSettings extends javax.swing.JFrame {
 
         jLabel11.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel11.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel11.setText("Inner Password");
+        jLabel11.setText("DataBase Password");
 
         jbtnSave.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jbtnSave.setText("Save");
@@ -270,7 +269,7 @@ public class frmSettings extends javax.swing.JFrame {
 
         jLabel13.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jLabel13.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel13.setText("Company");
+        jLabel13.setText("SAP Company Code");
 
         lbl1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         lbl1.setForeground(new java.awt.Color(255, 255, 255));
@@ -280,6 +279,11 @@ public class frmSettings extends javax.swing.JFrame {
 
         jtxtSubStation.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jtxtSubStation.setHorizontalAlignment(javax.swing.JTextField.CENTER);
+        jtxtSubStation.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtxtSubStationActionPerformed(evt);
+            }
+        });
 
         lbl2.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         lbl2.setForeground(new java.awt.Color(255, 255, 255));
@@ -294,7 +298,6 @@ public class frmSettings extends javax.swing.JFrame {
                 .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 333, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jtxtInnerPass, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cbSerialPort, javax.swing.GroupLayout.Alignment.LEADING, 0, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jtxtServer, javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jtxtDB, javax.swing.GroupLayout.Alignment.LEADING)
@@ -302,31 +305,29 @@ public class frmSettings extends javax.swing.JFrame {
                     .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jLabel7, javax.swing.GroupLayout.DEFAULT_SIZE, 125, Short.MAX_VALUE)
                             .addComponent(jLabel8, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .addGap(83, 83, 83))
                     .addComponent(lbl, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addComponent(jLabel11, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jtxtPass))
                 .addGap(56, 56, 56)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jLabel10, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addComponent(jLabel13, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jtxtNoStation)
+                            .addComponent(jtxtCompany)
+                            .addComponent(jtxtScanSleep, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(lbl1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(3, 3, 3)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
-                                    .addComponent(jtxtNoStation, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(jtxtCompany, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 153, Short.MAX_VALUE)
-                                    .addComponent(jtxtScanSleep)
-                                    .addComponent(lbl1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jtxtPass, javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                        .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                        .addGap(83, 83, 83))))
+                                .addComponent(jLabel9, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(83, 83, 83))
                             .addComponent(lbl2)
-                            .addComponent(jtxtSubStation, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addGap(0, 0, Short.MAX_VALUE)))
+                            .addComponent(jtxtInnerPass)
+                            .addComponent(jtxtSubStation, javax.swing.GroupLayout.Alignment.TRAILING))
+                        .addGap(0, 16, Short.MAX_VALUE)))
                 .addGap(89, 89, 89))
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
@@ -366,16 +367,16 @@ public class frmSettings extends javax.swing.JFrame {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jLabel11)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtxtInnerPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jtxtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(lbl)
                             .addComponent(lbl1)))
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel9)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtxtPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addComponent(jtxtInnerPass, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(cbSerialPort, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
@@ -401,6 +402,10 @@ public class frmSettings extends javax.swing.JFrame {
         // TODO add your handling code here:
         writePathDB();
     }//GEN-LAST:event_jbtnSaveActionPerformed
+
+    private void jtxtSubStationActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtxtSubStationActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jtxtSubStationActionPerformed
 
     /**
      * @param args the command line arguments
