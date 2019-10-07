@@ -3,8 +3,8 @@ b10
 root
 toor
 400
-2513
+2
 123
 
 5210
-COM2
+Select Serial Port

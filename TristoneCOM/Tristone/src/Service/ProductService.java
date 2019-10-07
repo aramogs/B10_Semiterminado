@@ -14,6 +14,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.util.Scanner;
 
+
 /**
  *
  * @author Ulises
@@ -63,12 +64,15 @@ public class ProductService {
             ResultSet rs = query.executeQuery();
             if(rs.next())
             {
+                System.out.println(rs.getString("id"));
                 _ProductsEntity.setId(rs.getString("id")); 
                 _ProductsEntity.setNo_sap(rs.getString("no_sap")); 
                 _ProductsEntity.setPcks(rs.getString("pckd")); 
                 _ProductsEntity.setNo_part(rs.getString("no_part")); 
                 _ProductsEntity.setCust(rs.getString("cust")); 
-                _ProductsEntity.setPlat(rs.getString("plat")); 
+                _ProductsEntity.setPlat(rs.getString("plat"));
+                
+   
             }
             return _ProductsEntity;
         }catch(Exception ex){

@@ -152,6 +152,45 @@ public class ProductsEntity {
     public void setPlat(String plat) {
         this.plat = plat;
     }
+    
+     private String unit_weight;
+
+    /**
+     * Get the value of unit_weight
+     *
+     * @return the value of unit_weight
+     */
+    public String getUnit_weight() {
+        return unit_weight;
+    }
+
+    /**
+     * Set the value of unit_weight
+     *
+     * @param unit_weight new value of unit_weight
+     */
+    public void setUnit_weight(String unit_weight) {
+        this.unit_weight = unit_weight;
+    }
+    
+       private byte[] image;
+
+    /**
+     * Get the value of image
+     *
+     * @return the value of image
+     */
+    public byte[] getImage() {
+        return image;
+    }
+    /**
+     * Set the value of image
+     *
+     * @param image new value of image
+     */
+    public void setImage(byte [] image) {
+        this.image = image;
+    }
 
     
 }

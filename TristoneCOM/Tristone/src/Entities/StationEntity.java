@@ -21,8 +21,10 @@ public class StationEntity {
     private boolean enableStation;
     private boolean enable;
     private String mysql_db;
-
     private String confimar;
+    private String container_weight;
+
+   
 
     /**
      * Get the value of confimar
@@ -238,6 +240,14 @@ public class StationEntity {
      */
     public void setMysql_db(String mysql_db) {
         this.mysql_db = mysql_db;
+    }
+    
+     public String getContainer_weight() {
+        return container_weight;
+    }
+
+    public void setContainer_weight(String container_weight) {
+        this.container_weight = container_weight;
     }
 
 }

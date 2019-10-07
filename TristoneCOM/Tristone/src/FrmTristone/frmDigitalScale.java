@@ -5,8 +5,6 @@
  */
 package FrmTristone;
 
-
-
 import Entities.ConsumerJSONEntity;
 import Entities.EmployeeEntity;
 import Entities.PrintEntity;
@@ -22,11 +20,19 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+import com.sun.javafx.tk.Toolkit;
+import static com.sun.javafx.tk.Toolkit.getToolkit;
 import gnu.io.CommPort;
 import gnu.io.CommPortIdentifier;
 import gnu.io.SerialPort;
 import java.awt.Color;
+import java.awt.Dimension;
+import java.awt.Image;
 import java.awt.event.KeyEvent;
+import java.awt.image.BufferedImage;
+import java.awt.image.DataBuffer;
+import java.awt.image.DataBufferByte;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,15 +42,18 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.Date;
 import java.util.Enumeration;
 import java.util.Scanner;
 import java.util.concurrent.TimeoutException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.Icon;
+import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 
 /**
  *
@@ -55,14 +64,13 @@ public class frmDigitalScale extends javax.swing.JFrame {
     /**
      * Creates new form frmDigitalScale
      */
-    
-     /**
+    /**
      * Parameters
      */
-    boolean testBtn=false;
+    boolean testBtn = false;
     String _noEmployee = "";
-    String _station="";
-    Enumeration commports= null;
+    String _station = "";
+    Enumeration commports = null;
     CommPortIdentifier myCPI = null;
     Scanner mySC;
     PrintStream myPS;
@@ -74,21 +82,23 @@ public class frmDigitalScale extends javax.swing.JFrame {
     private static String employee = "";
     ProductsEntity _ProductsEntity;
     int stdPack = 0;
+    double _weight = 0.0;
     double _stdPack = 0.00;
+    double _containerWeight = 0.00;
     String _cancelCode = "";
     String _confirmCode = "";
     Channel channel;
     SerialPort mySP = null;
-    String _numEmployee="";
+    String _numEmployee = "";
     int contStdPack = 0;
-    String cancelCode="";
-    static String valueSP="";
-    static boolean decInt = false;
-    static String valuelbl="";
-    
-    String scanSleep="";
-    private static final String QUEUE_NAME = "workQueues";   
-    private static int i=0;
+    String cancelCode = "";
+    static String valueSP = "";
+    static boolean decInt = true;
+    static String valuelbl = "";
+
+    String scanSleep = "";
+    private static final String QUEUE_NAME = "workQueues";
+    private static int i = 0;
     private static final String EXCHANGE_NAME = "stations";
     //private static final String EXCHANGE_NAME = "station";
     //private static final String EXCHANGE_NAME = "workExchange";
@@ -96,10 +106,10 @@ public class frmDigitalScale extends javax.swing.JFrame {
     private Connection connection;
     //private Channel channel;
     DeliverCallback deliverCallback = null;
-    
+
     public frmDigitalScale() {
         super();
-         
+
         initComponents();
         getContentPane().setBackground(Color.DARK_GRAY);
         try {
@@ -117,9 +127,11 @@ public class frmDigitalScale extends javax.swing.JFrame {
         jtxtConfirm.setEnabled(false);
         CancelConfirmCode();
         SetMessageText(false);
+        SetMessageTextError(false);
+
+        jLabel7.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Tristone.png")).getImage().getScaledInstance(120, 60, Image.SCALE_SMOOTH)));
+
     }
-    
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -149,6 +161,13 @@ public class frmDigitalScale extends javax.swing.JFrame {
         jtxtMessage = new javax.swing.JTextField();
         jtxtConfirm = new javax.swing.JTextField();
         jlblConfirm = new javax.swing.JLabel();
+        lblNameCurrentCount1 = new javax.swing.JLabel();
+        lblCount1 = new javax.swing.JLabel();
+        lblPesop = new javax.swing.JLabel();
+        lblNameCurrentCount3 = new javax.swing.JLabel();
+        lblNameCurrentCount4 = new javax.swing.JLabel();
+        lblPesoc = new javax.swing.JLabel();
+        jLabel7 = new javax.swing.JLabel();
 
         jlblEmployeeNumb.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
         jlblEmployeeNumb.setForeground(new java.awt.Color(255, 255, 255));
@@ -161,14 +180,15 @@ public class frmDigitalScale extends javax.swing.JFrame {
         jLabel3.setText("Employee ID:");
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
-        setPreferredSize(new java.awt.Dimension(747, 400));
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
             }
         });
 
+        jLabel6.setBackground(new java.awt.Color(255, 255, 255));
         jLabel6.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        jLabel6.setForeground(new java.awt.Color(255, 255, 255));
         jLabel6.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel6.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Tristone.png"))); // NOI18N
         jLabel6.setToolTipText("");
@@ -190,7 +210,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
         jlblPartNumb1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jlblPartNumb1.setForeground(new java.awt.Color(255, 255, 255));
         jlblPartNumb1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlblPartNumb1.setText("Part Number");
+        jlblPartNumb1.setText("Numero Parte");
 
         jtxtSAPNumb.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jtxtSAPNumb.setHorizontalAlignment(javax.swing.JTextField.CENTER);
@@ -203,40 +223,42 @@ public class frmDigitalScale extends javax.swing.JFrame {
         lblSAPNum.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         lblSAPNum.setForeground(new java.awt.Color(255, 255, 255));
         lblSAPNum.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblSAPNum.setText("SAP Number");
+        lblSAPNum.setText("Numero SAP");
 
         jlblSdarPack.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jlblSdarPack.setForeground(new java.awt.Color(255, 255, 255));
         jlblSdarPack.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlblSdarPack.setText("Standard Pack");
 
-        jLabel1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jLabel1.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         jLabel1.setForeground(new java.awt.Color(255, 255, 255));
-        jLabel1.setText("Employee Name:");
+        jLabel1.setText("Nombre:");
         jLabel1.setName(""); // NOI18N
 
-        jlblEmployeeName.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jlblEmployeeName.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         jlblEmployeeName.setForeground(new java.awt.Color(255, 255, 255));
         jlblEmployeeName.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        jlblEmployeeName.setText("Employee ID:");
+        jlblEmployeeName.setText("Gafete:");
         jlblEmployeeName.setName("jlblEmployee"); // NOI18N
 
-        lblEmployeeName.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblEmployeeName.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         lblEmployeeName.setForeground(new java.awt.Color(255, 255, 255));
-        lblEmployeeName.setText("Employee Name:");
+        lblEmployeeName.setText("nombre");
         lblEmployeeName.setName(""); // NOI18N
 
-        lblEmployeeId.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblEmployeeId.setFont(new java.awt.Font("Arial", 1, 12)); // NOI18N
         lblEmployeeId.setForeground(new java.awt.Color(255, 255, 255));
         lblEmployeeId.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
-        lblEmployeeId.setText("Employee Name:");
+        lblEmployeeId.setText("gafete");
         lblEmployeeId.setName("jlblEmployee"); // NOI18N
 
-        lblCount.setFont(new java.awt.Font("Arial Black", 1, 72)); // NOI18N
-        lblCount.setForeground(new java.awt.Color(255, 255, 255));
+        lblCount.setBackground(new java.awt.Color(255, 255, 255));
+        lblCount.setFont(new java.awt.Font("Arial Black", 1, 18)); // NOI18N
+        lblCount.setForeground(new java.awt.Color(60, 63, 65));
         lblCount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         lblCount.setText("00");
         lblCount.setName("jlblEmployee"); // NOI18N
+        lblCount.setOpaque(true);
         lblCount.addInputMethodListener(new java.awt.event.InputMethodListener() {
             public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
             }
@@ -253,7 +275,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
         lblNameCurrentCount.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         lblNameCurrentCount.setForeground(new java.awt.Color(255, 255, 255));
         lblNameCurrentCount.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        lblNameCurrentCount.setText("Current Count");
+        lblNameCurrentCount.setText("Peso Actual");
         lblNameCurrentCount.setName("jlblEmployee"); // NOI18N
 
         btnTest.setText("Test");
@@ -277,7 +299,92 @@ public class frmDigitalScale extends javax.swing.JFrame {
         jlblConfirm.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jlblConfirm.setForeground(new java.awt.Color(255, 255, 255));
         jlblConfirm.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
-        jlblConfirm.setText("Confirm Count");
+        jlblConfirm.setText("Confirmar ");
+
+        lblNameCurrentCount1.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblNameCurrentCount1.setForeground(new java.awt.Color(255, 255, 255));
+        lblNameCurrentCount1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblNameCurrentCount1.setText("Piezas");
+        lblNameCurrentCount1.setName("jlblEmployee"); // NOI18N
+
+        lblCount1.setBackground(new java.awt.Color(255, 255, 255));
+        lblCount1.setFont(new java.awt.Font("Arial Black", 1, 18)); // NOI18N
+        lblCount1.setForeground(new java.awt.Color(60, 63, 65));
+        lblCount1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblCount1.setText("00");
+        lblCount1.setName("jlblEmployee"); // NOI18N
+        lblCount1.setOpaque(true);
+        lblCount1.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                lblCount1InputMethodTextChanged(evt);
+            }
+        });
+        lblCount1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                lblCount1PropertyChange(evt);
+            }
+        });
+
+        lblPesop.setBackground(new java.awt.Color(204, 204, 204));
+        lblPesop.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        lblPesop.setForeground(new java.awt.Color(102, 102, 102));
+        lblPesop.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPesop.setText("00");
+        lblPesop.setName("jlblEmployee"); // NOI18N
+        lblPesop.setOpaque(true);
+        lblPesop.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                lblPesopInputMethodTextChanged(evt);
+            }
+        });
+        lblPesop.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                lblPesopPropertyChange(evt);
+            }
+        });
+
+        lblNameCurrentCount3.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblNameCurrentCount3.setForeground(new java.awt.Color(255, 255, 255));
+        lblNameCurrentCount3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblNameCurrentCount3.setText("Peso Pieza");
+        lblNameCurrentCount3.setName("jlblEmployee"); // NOI18N
+
+        lblNameCurrentCount4.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        lblNameCurrentCount4.setForeground(new java.awt.Color(255, 255, 255));
+        lblNameCurrentCount4.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblNameCurrentCount4.setText("Peso Contenedor");
+        lblNameCurrentCount4.setName("jlblEmployee"); // NOI18N
+
+        lblPesoc.setBackground(new java.awt.Color(204, 204, 204));
+        lblPesoc.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        lblPesoc.setForeground(new java.awt.Color(102, 102, 102));
+        lblPesoc.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        lblPesoc.setText("00");
+        lblPesoc.setName("jlblEmployee"); // NOI18N
+        lblPesoc.setOpaque(true);
+        lblPesoc.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                lblPesocInputMethodTextChanged(evt);
+            }
+        });
+        lblPesoc.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                lblPesocPropertyChange(evt);
+            }
+        });
+
+        jLabel7.setBackground(new java.awt.Color(255, 255, 255));
+        jLabel7.setFont(new java.awt.Font("Arial", 1, 10)); // NOI18N
+        jLabel7.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Tristone.png"))); // NOI18N
+        jLabel7.setToolTipText("");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -287,63 +394,79 @@ public class frmDigitalScale extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(37, 37, 37)
-                                .addComponent(lblNameCurrentCount, javax.swing.GroupLayout.PREFERRED_SIZE, 186, javax.swing.GroupLayout.PREFERRED_SIZE))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(10, 10, 10)
-                                .addComponent(lblCount, javax.swing.GroupLayout.PREFERRED_SIZE, 302, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                        .addGap(41, 41, 41)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jtxtStdarPack)
-                            .addComponent(lblSAPNum, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addComponent(jlblSdarPack, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                                .addGap(42, 42, 42)
-                                .addComponent(jlblPartNumb1, javax.swing.GroupLayout.DEFAULT_SIZE, 227, Short.MAX_VALUE)
-                                .addGap(42, 42, 42))
-                            .addComponent(jtxtPartNumCopy)
-                            .addComponent(jtxtSAPNumb)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 438, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
+                            .addComponent(jtxtStdarPack, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jtxtSAPNumb, javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addComponent(jtxtPartNumCopy, javax.swing.GroupLayout.Alignment.TRAILING)
                             .addComponent(jtxtConfirm)
-                            .addComponent(jlblConfirm, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jlblConfirm, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jlblSdarPack, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(jlblPartNumb1, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .addComponent(lblSAPNum, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 297, javax.swing.GroupLayout.PREFERRED_SIZE))
                         .addContainerGap())
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 203, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(56, 56, 56)
-                                .addComponent(btnTest))
+                                .addGap(70, 70, 70)
+                                .addComponent(lblPesoc, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
                             .addGroup(layout.createSequentialGroup()
-                                .addGap(18, 18, 18)
-                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                                    .addComponent(jlblEmployeeName, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                    .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, 119, Short.MAX_VALUE))
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addGap(36, 36, 36)
+                                .addComponent(lblNameCurrentCount4, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(56, 56, 56)
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                                    .addComponent(lblEmployeeName, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE)
-                                    .addComponent(lblEmployeeId, javax.swing.GroupLayout.DEFAULT_SIZE, 314, Short.MAX_VALUE))
-                                .addContainerGap())))))
+                                    .addComponent(lblPesop, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblNameCurrentCount3, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNameCurrentCount, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 113, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCount, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(60, 60, 60)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(lblNameCurrentCount1, javax.swing.GroupLayout.PREFERRED_SIZE, 96, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCount1, javax.swing.GroupLayout.PREFERRED_SIZE, 107, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGap(23, 23, 23))
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(27, 27, 27)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(btnTest, javax.swing.GroupLayout.PREFERRED_SIZE, 24, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(jlblEmployeeName, javax.swing.GroupLayout.PREFERRED_SIZE, 67, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblEmployeeId, javax.swing.GroupLayout.PREFERRED_SIZE, 52, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 70, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(lblEmployeeName)))
+                        .addGap(0, 0, Short.MAX_VALUE))))
             .addComponent(jtxtMessage)
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblEmployeeName, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jlblEmployeeName, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(lblEmployeeId))
-                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                                    .addComponent(jlblEmployeeName, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblEmployeeId)
+                                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(lblEmployeeName, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 25, Short.MAX_VALUE)
+                                .addComponent(btnTest, javax.swing.GroupLayout.PREFERRED_SIZE, 18, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addComponent(jLabel7, javax.swing.GroupLayout.PREFERRED_SIZE, 54, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.DEFAULT_SIZE, 248, Short.MAX_VALUE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(52, 52, 52)
                         .addComponent(lblSAPNum)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jtxtSAPNumb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnTest))
+                        .addComponent(jtxtSAPNumb, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jlblPartNumb1)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
@@ -355,44 +478,56 @@ public class frmDigitalScale extends javax.swing.JFrame {
                         .addGap(9, 9, 9)
                         .addComponent(jlblConfirm)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtxtConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addComponent(jtxtConfirm, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(12, 12, 12)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addComponent(lblNameCurrentCount, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(lblCount, javax.swing.GroupLayout.PREFERRED_SIZE, 103, javax.swing.GroupLayout.PREFERRED_SIZE)))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 31, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblNameCurrentCount, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblNameCurrentCount1, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblCount, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblCount1, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblNameCurrentCount3, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblNameCurrentCount4, javax.swing.GroupLayout.PREFERRED_SIZE, 17, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(lblPesoc, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(lblPesop, javax.swing.GroupLayout.PREFERRED_SIZE, 26, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jtxtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    public void SetEmployee(String noEmployee){
-        EmployeesModel objEmployee=new EmployeesModel();
-        EmployeeEntity _employeeEntity=new EmployeeEntity();
+    public void SetEmployee(String noEmployee) {
+        EmployeesModel objEmployee = new EmployeesModel();
+        EmployeeEntity _employeeEntity = new EmployeeEntity();
         _employeeEntity = objEmployee.getEmployee(noEmployee);
-                
+
         lblEmployeeName.setText(_employeeEntity.getNameEmployee());
         lblEmployeeId.setText(_employeeEntity.getNumEmployee());
-        _numEmployee=_employeeEntity.getNumEmployee();
+        _numEmployee = _employeeEntity.getNumEmployee();
         _noEmployee = noEmployee;
-        employee=_employeeEntity.getIdEmployee();
+        employee = _employeeEntity.getIdEmployee();
     }
-    
-    public void getEmployee(String idEmployee){
-        String _idEmployee="";
-        EmployeesModel objEmployee=new EmployeesModel();
-        EmployeeEntity _employeeEntity=new EmployeeEntity();
+
+    public void getEmployee(String idEmployee) {
+        String _idEmployee = "";
+        EmployeesModel objEmployee = new EmployeesModel();
+        EmployeeEntity _employeeEntity = new EmployeeEntity();
         _employeeEntity = objEmployee.getEmployee(idEmployee);
-                
+
         lblEmployeeName.setText(_employeeEntity.getNameEmployee());
         lblEmployeeId.setText(_employeeEntity.getNumEmployee());
         _idEmployee = _employeeEntity.getIdEmployee();
     }
-    
-    
+
+
     private void jtxtPartNumCopyActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtxtPartNumCopyActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_jtxtPartNumCopyActionPerformed
@@ -414,230 +549,307 @@ public class frmDigitalScale extends javax.swing.JFrame {
 
     private void lblCountInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_lblCountInputMethodTextChanged
         // TODO add your handling code here:
-        if(!decInt){
-            int inputSP= Integer.parseInt(lblCount.getText());
-            if(inputSP > 0 && inputSP <= stdPack){ //9/05/2019 Ciscomar
+        if (!decInt) {
+            int inputSP = Integer.parseInt(lblCount.getText());
+            if (inputSP > 0 && inputSP <= stdPack) { //9/05/2019 Ciscomar
                 jtxtConfirm.setEnabled(true);
                 //jtxtConfirm.setVisible(true);
 
-            }else{
+            } else {
                 jtxtConfirm.setEnabled(false);
                 //jtxtConfirm.setVisible(false);
                 //SetMessageText(false);
             }
-        }else{
-            double inputSP= Double.parseDouble(lblCount.getText());
-            if(inputSP > 0 && inputSP <= _stdPack){ //9/05/2019 Ciscomar
+        } else {
+
+            double inputC = Double.parseDouble(lblCount1.getText());
+            if (inputC > 0 && inputC <= stdPack) { //9/05/2019 Ciscomar
                 jtxtConfirm.setEnabled(true);
                 //jtxtConfirm.setVisible(true);
 
-            }else{
+            } else {
                 jtxtConfirm.setEnabled(false);
                 //jtxtConfirm.setVisible(false);
                 //SetMessageText(false);
             }
         }
-        
-        
-        jtxtStdarPack.setText("0/"+ lblCount.getText());
+
+        jtxtStdarPack.setText("0/" + lblCount.getText());
     }//GEN-LAST:event_lblCountInputMethodTextChanged
-    
-    private void SetMessageText(boolean confirm){
-        if(confirm){
-            
+
+    private void SetMessageText(boolean confirm) {
+        if (confirm) {
+
             try {
-                jtxtMessage.setText("PRINT");
+                jtxtMessage.setText("IMPRIMIR");
                 jtxtMessage.setBackground(Color.GREEN);
                 jtxtMessage.setEditable(false);
                 jtxtConfirm.setEnabled(true);
                 jtxtConfirm.requestFocus();
-                
-                
+
             } catch (Exception ex) {
                 Logger.getLogger(frmDigitalScale.class.getName()).log(Level.SEVERE, null, ex);
             }
-        }
-        else{
+        } else {
             jtxtMessage.setText("");
             jtxtMessage.setBackground(Color.WHITE);
             jtxtMessage.setEditable(false);
         }
-        
+
     }
-    
+
+    private void SetMessageTextError(boolean confirm) {
+        if (confirm) {
+
+            try {
+                jtxtMessage.setText("QUITAR PIEZAS");
+                jtxtMessage.setBackground(Color.RED);
+                jtxtMessage.setEditable(false);
+                jtxtConfirm.setEnabled(true);
+                jtxtConfirm.requestFocus();
+
+            } catch (Exception ex) {
+                Logger.getLogger(frmDigitalScale.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            jtxtMessage.setText("");
+            jtxtMessage.setBackground(Color.WHITE);
+            jtxtMessage.setEditable(false);
+        }
+
+    }
+
     private void lblCountPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblCountPropertyChange
         // TODO add your handling code here: 
         //true si es decimal
-        if(!decInt){
-             int inputSP = Integer.parseInt(lblCount.getText());
-            if(inputSP > 0 && inputSP <= stdPack){ //9/05/2019 Ciscomar
+        if (!decInt) {
+            int inputSP = Integer.parseInt(lblCount.getText());
+            if (inputSP > 0 && inputSP <= stdPack) { //9/05/2019 Ciscomar
                 jlblConfirm.setVisible(true);
                 jtxtConfirm.setVisible(true);
                 jtxtConfirm.setEnabled(true);
                 SetMessageText(true);
-            }else{
+            } else {
                 jlblConfirm.setVisible(false);
                 jtxtConfirm.setVisible(false);
                 jtxtConfirm.setEnabled(false);
                 SetMessageText(false);
             }
-            if(lblCount.getText() != "00")
-                jtxtStdarPack.setText(lblCount.getText()+"/"+ stdPack);
-        }else{
-             double inputSP = Double.parseDouble(lblCount.getText());
-            if(inputSP > 0 && inputSP <= _stdPack){ //9/05/2019 Ciscomar
+            if (lblCount.getText() != "00") {
+                jtxtStdarPack.setText(lblCount.getText() + "/" + stdPack);
+            }
+        } else {
+
+            int inputC = Integer.parseInt(lblCount1.getText());
+            double inputSP = Double.parseDouble(lblCount.getText());
+            //System.out.println(inputSP);
+            if (inputSP > 0.0 && inputSP > _containerWeight) {
+                double total = Math.round((inputSP - _containerWeight) / _weight);
+                int totalC = (int) total;
+                lblCount1.setText("" + totalC);
+            } else {
+                lblCount1.setText("0");
+            }
+
+            if (inputC > 0 && inputC <= stdPack) { //9/05/2019 Ciscomar
                 jlblConfirm.setVisible(true);
                 jtxtConfirm.setVisible(true);
                 jtxtConfirm.setEnabled(true);
                 SetMessageText(true);
-            }else{
+            } else if (inputC == 0) {
                 jlblConfirm.setVisible(false);
                 jtxtConfirm.setVisible(false);
                 jtxtConfirm.setEnabled(false);
                 SetMessageText(false);
+                SetMessageTextError(false);
+            } else {
+                jlblConfirm.setVisible(false);
+                jtxtConfirm.setVisible(false);
+                jtxtConfirm.setEnabled(false);
+                SetMessageText(false);
+                SetMessageTextError(true);
             }
-            if(lblCount.getText() != "0.00")
-                jtxtStdarPack.setText(lblCount.getText()+"/"+ _stdPack);
+            if (lblCount.getText() != "0.00") {
+                jtxtStdarPack.setText(lblCount1.getText() + "/" + stdPack);
             }
-       
+        }
+
     }//GEN-LAST:event_lblCountPropertyChange
 
     private void jtxtConfirmKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtxtConfirmKeyPressed
         // TODO add your handling code here:
-         if(evt.getKeyCode() == KeyEvent.VK_ENTER ){
-              try {
-                  String code = jtxtConfirm.getText();
-                 if(code.equals(_cancelCode)){
-                     frmEmployee _frmEmployee=new frmEmployee();
-               
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+            try {
+                String code = jtxtConfirm.getText();
+                if (code.equals(_cancelCode)) {
+                    frmEmployee _frmEmployee = new frmEmployee();
+
                     _frmEmployee.setVisible(true);
                     //this.setVisible(false);
                     mySP.close();
                     this.dispose();
-                 } else{
-                    if(code.equals(_confirmCode)){
+                } else {
+                    if (code.equals(_confirmCode)) {
                         jtxtConfirm.setEnabled(false);
-                        Send(lblCount.getText()); //9/05/2019 Ciscomar
+                        Send(lblCount1.getText()); //9/05/2019 Ciscomar
                     }
                 }
             } catch (Exception ex) {
                 Logger.getLogger(frmDigitalScale.class.getName()).log(Level.SEVERE, null, ex);
             }
-         }
-        
+        }
+
     }//GEN-LAST:event_jtxtConfirmKeyPressed
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         // TODO add your handling code here:
         t.stop();
-         mySP.close();
+        mySP.close();
     }//GEN-LAST:event_formWindowClosing
 
-    public void SetNoSAP(ProductsEntity _productsEntity){
-         _ProductsEntity=new ProductsEntity();
+    private void lblCount1InputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_lblCount1InputMethodTextChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblCount1InputMethodTextChanged
+
+    private void lblCount1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblCount1PropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblCount1PropertyChange
+
+    private void lblPesopInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_lblPesopInputMethodTextChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblPesopInputMethodTextChanged
+
+    private void lblPesopPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblPesopPropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblPesopPropertyChange
+
+    private void lblPesocInputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_lblPesocInputMethodTextChanged
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblPesocInputMethodTextChanged
+
+    private void lblPesocPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblPesocPropertyChange
+        // TODO add your handling code here:
+    }//GEN-LAST:event_lblPesocPropertyChange
+
+    public void SetNoSAP(ProductsEntity _productsEntity) throws IOException {
+        _ProductsEntity = new ProductsEntity();
         _ProductsEntity.setNo_part(_productsEntity.getNo_part());
         _ProductsEntity.setNo_sap(_productsEntity.getNo_sap());
+        _ProductsEntity.setUnit_weight(_productsEntity.getUnit_weight());
         _ProductsEntity.setPcks(_productsEntity.getPcks());
         _ProductsEntity.setPlat(_productsEntity.getPlat());
         _productsEntity.setDecInt(_productsEntity.getDecInt());
         jtxtSAPNumb.setText(_productsEntity.getNo_sap());
         jtxtPartNumCopy.setText(_productsEntity.getNo_part());
-        jtxtStdarPack.setText("0/"+_productsEntity.getPcks());
-        decInt =_productsEntity.getDecInt();
-        if(!decInt)
+        jtxtStdarPack.setText("0/" + _productsEntity.getPcks());
+        decInt = _productsEntity.getDecInt();
+        if (!decInt) {
             stdPack = Integer.parseInt(_productsEntity.getPcks());
-        else
+        } else {
             _stdPack = Double.parseDouble(_productsEntity.getPcks());
-        
-        
-    }
-    
-    private String SerialPortDB(){
-        String SP ="";
-         String dbPath="";
-        String dbName="";
-        String userDB="";
-        String passDB="";
-        String station="";
-        String scanSleep="";
-        String company="";
-        String innerPass="";
-        String _cancelCode = "";
-        String COM="";
-        String subStation="";
-        
-        StationEntity _stationEntity = new StationEntity();
-        StationModel objStationModel =new StationModel();
-        String path=new File ("TristonePath.txt").getAbsolutePath ();
-                      
-        File file = new File(path);
-        try{
-                if(file.exists())
-                {
-                    Scanner sc = new Scanner(file); 
-
-                    dbPath = sc.nextLine();
-                    dbName = sc.nextLine();
-                    userDB = sc.nextLine();
-                    passDB = sc.nextLine();
-                    station = sc.nextLine();
-                    subStation = sc.nextLine();
-                    innerPass = sc.nextLine();                
-                    scanSleep = sc.nextLine();
-                    company = sc.nextLine();
-                    COM = sc.nextLine();
-                    SP=COM;
-                    
-                 
-                }else{
-                    
-                }
-                
-                
         }
-        catch (Exception e) {
+        _weight = Double.parseDouble(_productsEntity.getUnit_weight());
+        lblPesop.setText(_productsEntity.getUnit_weight() + "kg");
+        double TotalPeso = (_weight * stdPack) + _containerWeight;
+
+        byte[] imagee;
+        imagee = _productsEntity.getImage();
+  
+        if (imagee != null) {
+            imagee = _productsEntity.getImage();   
+            ImageIcon imagen = new ImageIcon(imagee);
+            Image im = imagen.getImage();
+            Image myImg = im.getScaledInstance(jLabel6.getWidth(), jLabel6.getHeight(), Image.SCALE_SMOOTH);
+            ImageIcon newImage = new ImageIcon(myImg);
+            jLabel6.setIcon(newImage);
+        } else {
+            
+            jLabel6.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/img/TristoneNoImage.png")).getImage().getScaledInstance(410, 260, Image.SCALE_SMOOTH)));
+        }
+
+    }
+
+    private String SerialPortDB() {
+        String SP = "";
+        String dbPath = "";
+        String dbName = "";
+        String userDB = "";
+        String passDB = "";
+        String station = "";
+        String scanSleep = "";
+        String company = "";
+        String innerPass = "";
+        String _cancelCode = "";
+        String COM = "";
+        String subStation = "";
+
+        StationEntity _stationEntity = new StationEntity();
+        StationModel objStationModel = new StationModel();
+        String path = new File("TristonePath.txt").getAbsolutePath();
+
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                Scanner sc = new Scanner(file);
+
+                dbPath = sc.nextLine();
+                dbName = sc.nextLine();
+                userDB = sc.nextLine();
+                passDB = sc.nextLine();
+                station = sc.nextLine();
+                subStation = sc.nextLine();
+                innerPass = sc.nextLine();
+                scanSleep = sc.nextLine();
+                company = sc.nextLine();
+                COM = sc.nextLine();
+                SP = COM;
+
+            } else {
+
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
-        
+
         return SP;
     }
-    
-    private void CallSerialPort() throws Exception{
-        
+
+    private void CallSerialPort() throws Exception {
+
         commports = CommPortIdentifier.getPortIdentifiers();
         t = new Thread(new ReadSerial());
         CommPort puerto = null;
         mySP = null;
-        while(commports.hasMoreElements()){
-            try{ 
-             myCPI = (CommPortIdentifier) commports.nextElement();
-             System.out.println("Puerto " +myCPI.getName());
-             if(myCPI.getName().equals(SerialPortDB()) ){
-                 if(!port){
-                    
-                    mySP = (SerialPort) myCPI.open("Puerto Serial",2000);
-                 //mySP.setSerialPortParams(19200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
-                    entrada = mySP.getInputStream();
-                 //mySC = new Scanner(mySP.getInputStream());        
-                 //if(mySC.hasNextInt())
-                   // inputInt = mySC.nextInt();
-                    port = true;
-                    t.start();
-                 }
-             }
-            
-            }catch(Exception e){
-                   //JOptionPane.showConfirmDialog(null, "Port is Open "+ e.getMessage(), "Error"+ e.getMessage(), JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
+        while (commports.hasMoreElements()) {
+            try {
+                myCPI = (CommPortIdentifier) commports.nextElement();
+                System.out.println("Puerto " + myCPI.getName());
+                if (myCPI.getName().equals(SerialPortDB())) {
+                    if (!port) {
+
+                        mySP = (SerialPort) myCPI.open("Puerto Serial", 2000);
+                        //mySP.setSerialPortParams(19200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
+                        entrada = mySP.getInputStream();
+                        //mySC = new Scanner(mySP.getInputStream());        
+                        //if(mySC.hasNextInt())
+                        // inputInt = mySC.nextInt();
+                        port = true;
+                        t.start();
+                    }
+                }
+
+            } catch (Exception e) {
+                //JOptionPane.showConfirmDialog(null, "Port is Open "+ e.getMessage(), "Error"+ e.getMessage(), JOptionPane.DEFAULT_OPTION, JOptionPane.ERROR_MESSAGE);
             }
-                    
-                 //break;                    
+
+            //break;                    
         }
-        
+
         //Comportamiento para Regresar valor en puerto serial
         //CommPort puerto = myCPI.open("Puerto Serial",2000);
         //SerialPort puerto = (SerialPort) puerto;
-        
 //        mySP.setSerialPortParams(19200, SerialPort.DATABITS_8, SerialPort.STOPBITS_1, SerialPort.PARITY_NONE);
 //        
 //        mySC = new Scanner(mySP.getInputStream());        
@@ -658,105 +870,128 @@ public class frmDigitalScale extends javax.swing.JFrame {
 //       // mySC.close();
 //        return serial;
     }
-    
+
     public static class ReadSerial implements Runnable {
-       int aux;
-       String serial = "";
-       boolean consumeSP=false;
-       public boolean isNumeric(String s) {  
-         return s != null && s.matches("[-+]?\\d*\\.?\\d+");  
-       } 
-       
-       public void run () {
-           
-           while(true){
-              try {
+
+        int aux;
+        String serial = "";
+        boolean consumeSP = false;
+        int countDigit = 0;
+
+        public boolean isNumeric(String s) {
+            return s != null && s.matches("[-+]?\\d*\\.?\\d+");
+        }
+
+        public void run() {
+
+            while (true) {
+                //decInt=true;
+                try {
                     //aux = inputInt ;
                     //buffer=entrada.read();
                     aux = entrada.read(); // aqui estamos obteniendo nuestro dato serial
                     //Thread.sleep(100);
-                    if(!consumeSP){
-                        valueSP="";
-                        inputInt=0;
+                    if (!consumeSP) {
+                        valueSP = "";
+                        inputInt = 0;
+                        inputDouble = 0;
                     }
-                        
-                    if (aux>0) {
-                        consumeSP=true;
-                        serial += (char)aux;
-                        if(isNumeric(serial) || serial.equals(".")){
+                    /////////////////////////////////////////////////////////////////////////////////////////////////////// TODAY    
+                    if (aux > 0) {
+
+                        consumeSP = true;
+                        serial += (char) aux;
+                        //decInt=true;
+                        if (isNumeric(serial) || serial.equals(".")) {
+
                             //inputInt=Integer.parseInt(serial);
-                        //inputInt=Integer.parseInt(serial);
-                            if(decInt){
-                                if(!serial.equals(".")){
+                            //inputInt=Integer.parseInt(serial);
+                            decInt = true;
+                            if (decInt) {
+
+                                if (!serial.equals(".")) {
                                     valueSP += serial;
-                                }else{
+                                } else {
                                     valueSP += ".";
                                 }
+                                //System.out.println(valueSP);
                                 inputDouble = Double.parseDouble(valueSP);
+                                countDigit++;
                                 //lblCount.setText(inputDouble);
                                 //lblCount.setText("" + inputDouble);
-                                 //System.out.println("" + inputDouble);
+                                //System.out.println("" + inputDouble);
                                 //lblNameCurrentCount.setText("" + inputDouble);
-                            }else{
-                                if(!serial.equals(".")){
+                            } else {
+
+                                if (!serial.equals(".")) {
                                     valueSP += serial;
-                                    inputInt=Integer.parseInt(valueSP);
-                                    lblCount.setText("" + inputInt);
+                                    inputInt = Integer.parseInt(valueSP);
+                                    //lblCount.setText("" + inputInt);
                                     //System.out.println("" + inputInt);
                                 }
                             }
-                        }else{
+                        } else {
+
                             serial = "";
                             //inputInt = 0;
                             //valueSP = "";
-                            if(inputInt>0){
-                                consumeSP=false;
+                            //System.out.println("dentro"+inputDouble);
+                            consumeSP = false;
+
+                            if (inputDouble > 0) {
+
+                                //consumeSP = false;
                                 String vallbl = lblCount.getText();
-                                if(!vallbl.equals(valueSP)){
+                                if (!vallbl.equals(valueSP)) {
+
                                     //lblCount.setText("");
-                                    lblCount.setText("" + inputInt);
+                                    lblCount.setText("" + inputDouble);
                                 }
+                            } else if ((countDigit == 5 || countDigit == 6) && inputDouble == 0) {
+                                lblCount.setText("0.000");
+
+                            }
+
+                            if (countDigit == 5 || countDigit == 6) {
+                                countDigit = 0;
                             }
                         }
-                        
-                        
-                    }else{
+
+                        ///////////////////////////////////////////////////////////////////////////////////////////////////////    
+                    } else {
                         serial = "";
                         //inputInt = 0;
                         //valueSP="";
-                        consumeSP=false;
-                        if(inputInt>0){
-                             if(isNumeric(serial) || serial.equals(".")){
-                                 String vallbl = lblCount.getText();
-                                if(!vallbl.equals(valueSP)){
+                        consumeSP = false;
+                        if (inputInt > 0) {
+                            if (isNumeric(serial) || serial.equals(".")) {
+                                String vallbl = lblCount.getText();
+                                if (!vallbl.equals(valueSP)) {
                                     //lblCount.setText("");
                                     //lblCount.setText("" + inputInt);
                                 }
-                             }
-                            
+                            }
+
                         }
-                        
-                            
+
                     }
-                    
-                   
+
                 } catch (Exception e) {
-                    int a=0;
-                } 
-              finally{
-                  serial = "";
-                  //inputInt = 0;
-                 
-              }
-           } 
-       }
-  }
-        
+                    int a = 0;
+
+                } finally {
+                    serial = "";
+                    //inputInt = 0;
+
+                }
+            }
+        }
+    }
+
     /**
      * @param args the command line arguments
      */
-    
-    public static void main(String args[])throws Exception  {
+    public static void main(String args[]) throws Exception {
         /* Set the Nimbus look and feel */
         //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
         /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
@@ -781,64 +1016,61 @@ public class frmDigitalScale extends javax.swing.JFrame {
         //</editor-fold>
 
         /* Create and display the form */
-        java.awt.EventQueue.invokeLater(new Runnable(){
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new frmDigitalScale().setVisible(true);
             }
-        });     
-        
+        });
+
     }
-        
+
     private void Send(String qty) {   // 09-05-2019 Ciscomar   
-        String routingKey="";
+        String routingKey = "";
         StationEntity _stationEntity = new StationEntity();
-        StationModel objStationModel =new StationModel();
-        boolean connMySQL=true;
-        boolean connRabbitMQ=true;
+        StationModel objStationModel = new StationModel();
+        boolean connMySQL = true;
+        boolean connRabbitMQ = true;
         _stationEntity = objStationModel.getStationConf(_station);
-        connMySQL=false;
+        connMySQL = false;
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(_stationEntity.getMq_server());
         //factory.setPort(5672);
         factory.setUsername(_stationEntity.getMq_user());
         factory.setPassword(_stationEntity.getMq_pass());
         //factory.setVirtualHost("/");
-        
-        try{
+
+        try {
             connection = factory.newConnection();
-            connRabbitMQ=false;
-        
+            connRabbitMQ = false;
+
             channel = connection.createChannel();
-        
-            channel.exchangeDeclare(EXCHANGE_NAME,"direct",true);
-          
+
+            channel.exchangeDeclare(EXCHANGE_NAME, "direct", true);
+
             Gson gson = new Gson();
 
-            
             String message = gson.toJson(GetDataSendEntity(qty)); // 09-05-2019 Ciscomar
-            
-             routingKey = "s"+ _station;
-           
-            channel.basicPublish("", QUEUE_NAME,null, message.getBytes());
+
+            routingKey = "s" + _station;
+
+            channel.basicPublish("", QUEUE_NAME, null, message.getBytes());
             //System.out.println(String.format("Sent «%s»", message));
             System.out.println(" [x] Sent '" + routingKey + "':'" + message + "'");
 
             //Thread.sleep(10000);
-             channel.close();
+            channel.close();
             connection.close();
-            Consumer(routingKey); 
-       
-        }catch(Exception e){
-                   
-        }finally{
-                      
+            Consumer(routingKey);
+
+        } catch (Exception e) {
+
+        } finally {
+
         }
 
-                    
-        
     }
-    
-    private void CancelConfirmCode(){
+
+    private void CancelConfirmCode() {
         String dbPath = "";
         String dbName = "";
         String userDB = "";
@@ -847,344 +1079,326 @@ public class frmDigitalScale extends javax.swing.JFrame {
         String innerPass = "";
         String cancelCode = "";
         String confirmCode = "";
-        
-        StationEntity _stationEntity = new StationEntity();
-        StationModel objStationModel =new StationModel();
-        
-        String path=new File ("TristonePath.txt").getAbsolutePath ();
-                      
-        File file = new File(path);
-        try{
-                if(file.exists())
-                {
-                    Scanner sc = new Scanner(file); 
 
-                    dbPath = sc.nextLine();
-                    dbName = sc.nextLine();
-                    userDB = sc.nextLine();
-                    passDB = sc.nextLine();
-                    station = sc.nextLine();
-                    innerPass = sc.nextLine();
-                    scanSleep = sc.nextLine();
-                    _station = station;
-                    
-                    _stationEntity = objStationModel.getStationConf(station);
-                    cancelCode = _stationEntity.getCancelacion();
-                    confirmCode = _stationEntity.getConfimar();
-                }
-                else{
-                    jtxtMessage.setText("The File doesn't exist"); 
-                    jtxtMessage.setBackground(Color.red);
-                    jtxtMessage.setEditable(false);
-                }
-        }
-        catch (Exception e) {
+        StationEntity _stationEntity = new StationEntity();
+        StationModel objStationModel = new StationModel();
+
+        String path = new File("TristonePath.txt").getAbsolutePath();
+
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                Scanner sc = new Scanner(file);
+
+                dbPath = sc.nextLine();
+                dbName = sc.nextLine();
+                userDB = sc.nextLine();
+                passDB = sc.nextLine();
+                station = sc.nextLine();
+                innerPass = sc.nextLine();
+                scanSleep = sc.nextLine();
+                _station = station;
+
+                _stationEntity = objStationModel.getStationConf(station);
+                cancelCode = _stationEntity.getCancelacion();
+                confirmCode = _stationEntity.getConfimar();
+            } else {
+                jtxtMessage.setText("The File doesn't exist");
+                jtxtMessage.setBackground(Color.red);
+                jtxtMessage.setEditable(false);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-        }
-        finally{
+        } finally {
             _confirmCode = confirmCode;
             _cancelCode = cancelCode;
-            
+            _containerWeight = Double.parseDouble(_stationEntity.getContainer_weight());
+            lblPesoc.setText(_stationEntity.getContainer_weight() + "kg");
+
             System.out.println(" Confirm Code'" + _confirmCode + "' cancel Code'" + _cancelCode + "'");
         }
     }
-    
-    private SendJsonEntity GetDataSendEntity(String qty){ // 09-05-2019 Ciscomar
-        SendJsonEntity _sendJsonEntity=new SendJsonEntity();     
-       
-        
-        String dbPath="";
-        String dbName="";
-        String userDB="";
-        String passDB="";
-        String station="";
-        String scanSleep="";
-        String company="";
-        String innerPass="";
-        String _cancelCode = "";
-        String COM="";
-        String subStation="";
-        
-        StationEntity _stationEntity = new StationEntity();
-        StationModel objStationModel =new StationModel();
-        String path=new File ("TristonePath.txt").getAbsolutePath ();
-                      
-        File file = new File(path);
-        try{
-                if(file.exists())
-                {
-                    Scanner sc = new Scanner(file); 
 
-                    dbPath = sc.nextLine();
-                    dbName = sc.nextLine();
-                    userDB = sc.nextLine();
-                    passDB = sc.nextLine();
-                    station = sc.nextLine();
-                    subStation= sc.nextLine();
-                    innerPass = sc.nextLine();
-                    scanSleep = sc.nextLine();
-                    company = sc.nextLine();
-                    COM = sc.nextLine();
-                    
-                    _station = station;
-                    _stationEntity = objStationModel.getStationConf(station);
-                    _cancelCode = _stationEntity.getCancelacion();
-                    
-                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-                    LocalDateTime now = LocalDateTime.now(); 
-                    
-                    _sendJsonEntity.setnSAP(_ProductsEntity.getNo_sap());
+    private SendJsonEntity GetDataSendEntity(String qty) { // 09-05-2019 Ciscomar
+        SendJsonEntity _sendJsonEntity = new SendJsonEntity();
+
+        String dbPath = "";
+        String dbName = "";
+        String userDB = "";
+        String passDB = "";
+        String station = "";
+        String scanSleep = "";
+        String company = "";
+        String innerPass = "";
+        String _cancelCode = "";
+        String COM = "";
+        String subStation = "";
+
+        StationEntity _stationEntity = new StationEntity();
+        StationModel objStationModel = new StationModel();
+        String path = new File("TristonePath.txt").getAbsolutePath();
+
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                Scanner sc = new Scanner(file);
+
+                dbPath = sc.nextLine();
+                dbName = sc.nextLine();
+                userDB = sc.nextLine();
+                passDB = sc.nextLine();
+                station = sc.nextLine();
+                subStation = sc.nextLine();
+                innerPass = sc.nextLine();
+                scanSleep = sc.nextLine();
+                company = sc.nextLine();
+                COM = sc.nextLine();
+
+                _station = station;
+                _stationEntity = objStationModel.getStationConf(station);
+                _cancelCode = _stationEntity.getCancelacion();
+
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+
+                _sendJsonEntity.setnSAP(_ProductsEntity.getNo_sap());
 //                    if(decInt)
 //                        _sendJsonEntity.setPckd(Double.parseDouble(_ProductsEntity.getPcks()));
 //                    else
-                       _sendJsonEntity.setPckd(qty); // 09-05-2019 Ciscomar
-                    //_sendJsonEntity.setPckd(_ProductsEntity.getPcks()); // 09-05-2019 Ciscomar
-                    //_printEntity.setImpresora(_stationEntity.getImpre());
-                    //_printEntity.setFecha(dtf.format(now));
-                    //_printEntity.setnVali("");
-                    //_printEntity.setPlat(_ProductsEntity.getPlat());
-                    //_printEntity.setCust(_ProductsEntity.getCust());
-                    //_printEntity.setnParte(_ProductsEntity.getNo_part());
-                    _sendJsonEntity.setBartender(true);
-                    _sendJsonEntity.setEmpresa(company);
-                    _sendJsonEntity.setEstacion(station);
-                    _sendJsonEntity.setImpresoraBartender(_stationEntity.getImpre());
-                    _sendJsonEntity.setDataBase(_stationEntity.getMysql_db());
-                    _sendJsonEntity.setSubline(subStation);
-                    //_printEntity.setnSerieserie(0);
-                }
-                
-                
-        }
-        catch (Exception e) {
+                _sendJsonEntity.setPckd(qty); // 09-05-2019 Ciscomar
+                //_sendJsonEntity.setPckd(_ProductsEntity.getPcks()); // 09-05-2019 Ciscomar
+                //_printEntity.setImpresora(_stationEntity.getImpre());
+                //_printEntity.setFecha(dtf.format(now));
+                //_printEntity.setnVali("");
+                //_printEntity.setPlat(_ProductsEntity.getPlat());
+                //_printEntity.setCust(_ProductsEntity.getCust());
+                //_printEntity.setnParte(_ProductsEntity.getNo_part());
+                _sendJsonEntity.setBartender(true);
+                _sendJsonEntity.setEmpresa(company);
+                _sendJsonEntity.setEstacion(station);
+                _sendJsonEntity.setImpresoraBartender(_stationEntity.getImpre());
+                _sendJsonEntity.setDataBase(_stationEntity.getMysql_db());
+                _sendJsonEntity.setSubline(subStation);
+                //_printEntity.setnSerieserie(0);
+            }
+
+        } catch (Exception e) {
             //e.printStackTrace();
             return null;
+        } finally {
+            return _sendJsonEntity;
         }
-        finally{
-            return _sendJsonEntity;    
-        }
-        
+
     }
-   private boolean GetBartender(String dbName,String noSAP){
+
+    private boolean GetBartender(String dbName, String noSAP) {
         boolean result = false;
-        StationModel objStationModel =new StationModel();
-        ArrayList<Object> listTable=new ArrayList<Object>();
+        StationModel objStationModel = new StationModel();
+        ArrayList<Object> listTable = new ArrayList<Object>();
         listTable = objStationModel.GetTableName(dbName);
-        
-        if(listTable.size() > 0){
-            for(Object o : listTable){
-                result= objStationModel.ValidateBartender(o.toString(), noSAP,dbName);
-                if(result == true)
+
+        if (listTable.size() > 0) {
+            for (Object o : listTable) {
+                result = objStationModel.ValidateBartender(o.toString(), noSAP, dbName);
+                if (result == true) {
                     break;
+                }
             }
         }
-        
+
         return result;
     }
-   
-    private void Consumer(String stations)throws Exception{
+
+    private void Consumer(String stations) throws Exception {
         //Thread.sleep(10000);
         StationEntity _stationEntity = new StationEntity();
-        StationModel objStationModel =new StationModel();
-        
-       // ConnectionFactory factory = new ConnectionFactory();
+        StationModel objStationModel = new StationModel();
+
+        // ConnectionFactory factory = new ConnectionFactory();
         //factory.setHost("localhost");
-        boolean connMySQL=true;
-        boolean connRabbitMQ=true;
+        boolean connMySQL = true;
+        boolean connRabbitMQ = true;
         _stationEntity = objStationModel.getStationConf(_station);
-        connMySQL=false;
+        connMySQL = false;
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(_stationEntity.getMq_server());
-       
+
         factory.setUsername(_stationEntity.getMq_user());
         factory.setPassword(_stationEntity.getMq_pass());
-        try{
+        try {
             connection = factory.newConnection();
             channel = connection.createChannel();
 
-            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT,true);
+            channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.DIRECT, true);
             //channel.exchangeDeclare(EXCHANGE_NAME, BuiltinExchangeType.TOPIC);
             String queueName = channel.queueDeclare().getQueue();
 
             String bindingKey = stations;
             channel.queueBind(queueName, EXCHANGE_NAME, bindingKey);
 
-    //channel.queueDeclare(QUEUE_NAME, true, false, false, null);
+            //channel.queueDeclare(QUEUE_NAME, true, false, false, null);
             System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
-    //        channel.basicQos(1);
-            
+            //        channel.basicQos(1);
             deliverCallback = (consumerTag, delivery) -> {
-                
-                String message = new String(delivery.getBody(), "UTF-8");
-                System.out.println(" [x] Received '" +
-                    delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
-                System.out.println(" [x] Done");
-               ConsumerJSONEntity p = new Gson().fromJson(message,ConsumerJSONEntity.class);
-               ValidacionEntity v = new Gson().fromJson(p.getDato(),ValidacionEntity.class);
-                WorkQueue(v.getNoValidacion(),employee);
-                //WorkQueue("123",employee);
-                
-           
-                                               };
-            channel.basicConsume(queueName, true, deliverCallback, consumerTag -> { 
-                
-            });
-        }catch(Exception e){
-                         
-        }finally{
-           
-        }
-        
-        
-    }
-     
-    private PrintEntity GetDataEntity(){
-        PrintEntity _printEntity=new PrintEntity();     
-       
-        
-        String dbPath="";
-        String dbName="";
-        String userDB="";
-        String passDB="";
-        String station="";
-        String scanSleep="";
-        String innerPass="";
-        String company="";
-        String _cancelCode = "";
-        String COM="";
-        String subStation="";
-        
-        StationEntity _stationEntity = new StationEntity();
-        StationModel objStationModel =new StationModel();
-        String path=new File ("TristonePath.txt").getAbsolutePath ();
-                      
-        File file = new File(path);
-        try{
-                if(file.exists())
-                {
-                    Scanner sc = new Scanner(file); 
 
-                    dbPath = sc.nextLine();
-                    dbName = sc.nextLine();
-                    userDB = sc.nextLine();
-                    passDB = sc.nextLine();
-                    station = sc.nextLine();
-                    subStation = sc.nextLine();
-                    innerPass = sc.nextLine();
-                    scanSleep = sc.nextLine();
-                    company = sc.nextLine();
-                    COM = sc.nextLine();
-                    
-                    _station = station;
-                    _stationEntity = objStationModel.getStationConf(station);
-                    _cancelCode = _stationEntity.getCancelacion();
-                    
-                    DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
-                    LocalDateTime now = LocalDateTime.now();             
-                    
-                    
-                    _printEntity.setnSAP(_ProductsEntity.getNo_sap());
-                    _printEntity.setPckd(Integer.parseInt(_ProductsEntity.getPcks()));
-                    //_printEntity.setImpresora(_stationEntity.getImpre());
-                    _printEntity.setFecha(dtf.format(now));
-                    //_printEntity.setnVali("");
-                    _printEntity.setPlat(_ProductsEntity.getPlat());
-                    //En espera de que me asignen los horarios para el turno
-                    _printEntity.setTurno(getShedule());
-                    _printEntity.setCust(_ProductsEntity.getCust());
-                    //_printEntity.setnParte(_ProductsEntity.getNo_part());
-                    _printEntity.setBartender(true);
-                    _printEntity.setEmpresa(company);
-                    _printEntity.setEstacion(station);
-                    _printEntity.setEmp_num(_numEmployee);
-                    _printEntity.setImpresoraBartender(_stationEntity.getImpre());
-                    //_printEntity.setnSerieserie(0);
-                }
-               
-                
+                String message = new String(delivery.getBody(), "UTF-8");
+                System.out.println(" [x] Received '"
+                        + delivery.getEnvelope().getRoutingKey() + "':'" + message + "'");
+                System.out.println(" [x] Done");
+                ConsumerJSONEntity p = new Gson().fromJson(message, ConsumerJSONEntity.class);
+                ValidacionEntity v = new Gson().fromJson(p.getDato(), ValidacionEntity.class);
+                WorkQueue(v.getNoValidacion(), employee);
+                //WorkQueue("123",employee);
+
+            };
+            channel.basicConsume(queueName, true, deliverCallback, consumerTag -> {
+
+            });
+        } catch (Exception e) {
+
+        } finally {
+
         }
-        catch (Exception e) {
+
+    }
+
+    private PrintEntity GetDataEntity() {
+        PrintEntity _printEntity = new PrintEntity();
+
+        String dbPath = "";
+        String dbName = "";
+        String userDB = "";
+        String passDB = "";
+        String station = "";
+        String scanSleep = "";
+        String innerPass = "";
+        String company = "";
+        String _cancelCode = "";
+        String COM = "";
+        String subStation = "";
+
+        StationEntity _stationEntity = new StationEntity();
+        StationModel objStationModel = new StationModel();
+        String path = new File("TristonePath.txt").getAbsolutePath();
+
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                Scanner sc = new Scanner(file);
+
+                dbPath = sc.nextLine();
+                dbName = sc.nextLine();
+                userDB = sc.nextLine();
+                passDB = sc.nextLine();
+                station = sc.nextLine();
+                subStation = sc.nextLine();
+                innerPass = sc.nextLine();
+                scanSleep = sc.nextLine();
+                company = sc.nextLine();
+                COM = sc.nextLine();
+
+                _station = station;
+                _stationEntity = objStationModel.getStationConf(station);
+                _cancelCode = _stationEntity.getCancelacion();
+
+                DateTimeFormatter dtf = DateTimeFormatter.ofPattern("yyyy/MM/dd HH:mm:ss");
+                LocalDateTime now = LocalDateTime.now();
+
+                _printEntity.setnSAP(_ProductsEntity.getNo_sap());
+                _printEntity.setPckd(Integer.parseInt(_ProductsEntity.getPcks()));
+                //_printEntity.setImpresora(_stationEntity.getImpre());
+                _printEntity.setFecha(dtf.format(now));
+                //_printEntity.setnVali("");
+                _printEntity.setPlat(_ProductsEntity.getPlat());
+                //En espera de que me asignen los horarios para el turno
+                _printEntity.setTurno(getShedule());
+                _printEntity.setCust(_ProductsEntity.getCust());
+                //_printEntity.setnParte(_ProductsEntity.getNo_part());
+                _printEntity.setBartender(true);
+                _printEntity.setEmpresa(company);
+                _printEntity.setEstacion(station);
+                _printEntity.setEmp_num(_numEmployee);
+                _printEntity.setImpresoraBartender(_stationEntity.getImpre());
+                //_printEntity.setnSerieserie(0);
+            }
+
+        } catch (Exception e) {
             e.printStackTrace();
             return null;
+        } finally {
+            return _printEntity;
         }
-        finally{
-            return _printEntity;    
-        }
-        
+
     }
-     
-    private String getShedule(){
+
+    private String getShedule() {
         String workShedule = "";
         try {
-            
+
             SimpleDateFormat df = new SimpleDateFormat("HH:mm");
             Date now = new Date();
-            
+
             Date _workTime = df.parse(df.format(now));
-            
+
             //shedule 1
             Date d1 = df.parse("06:00");
             Date d2 = df.parse("15:30");
-            if(_workTime.compareTo(d1) > 0 && _workTime.compareTo(d2) < 0){
+            if (_workTime.compareTo(d1) > 0 && _workTime.compareTo(d2) < 0) {
                 workShedule = "T1";
-            } else{            
+            } else {
                 //shedule 2
                 Date d3 = df.parse("15:31");
                 Date d4 = df.parse("00:24");
-                if(_workTime.compareTo(d3) > 0 && _workTime.compareTo(d4) < 0){
+                if (_workTime.compareTo(d3) > 0 && _workTime.compareTo(d4) < 0) {
                     workShedule = "T2";
                 } else {
                     //shedule 3
                     Date d5 = df.parse("00:25");
                     Date d6 = df.parse("05:59");
-                    if(_workTime.compareTo(d5) > 0 && _workTime.compareTo(d6) < 0){
+                    if (_workTime.compareTo(d5) > 0 && _workTime.compareTo(d6) < 0) {
                         workShedule = "T3";
                     }
                 }
             }
-            
-            
+
         } catch (ParseException ex) {
             Logger.getLogger(frmStandarPAck.class.getName()).log(Level.SEVERE, null, ex);
         }
         return workShedule;
     }
-     
-    private void WorkQueue(String serialNumber, String Employee){
 
-       
-            frmSerialNumber _frmSerialNumber = new frmSerialNumber();
+    private void WorkQueue(String serialNumber, String Employee) {
 
-            _frmSerialNumber.SetSerialNumber(GetDataEntity());
-            _frmSerialNumber.SetEmployee(_noEmployee);
-            _frmSerialNumber.SetEmployee(Employee);
-            _frmSerialNumber.SetSerialNumber(Integer.parseInt(serialNumber));
-            
-            
-             try {
-                    channel.close();
-                    connection.close();
-                    
-                     
-                } catch (IOException ex) {
-                    Logger.getLogger(frmStandarPAck.class.getName()).log(Level.SEVERE, null, ex);
-                } catch (TimeoutException ex) {
-                    Logger.getLogger(frmStandarPAck.class.getName()).log(Level.SEVERE, null, ex);
-                }
-             
-           
-            _frmSerialNumber.setVisible(true);
-            this.dispose();
-       
+        frmSerialNumber _frmSerialNumber = new frmSerialNumber();
+
+        _frmSerialNumber.SetSerialNumber(GetDataEntity());
+        _frmSerialNumber.SetEmployee(_noEmployee);
+        _frmSerialNumber.SetEmployee(Employee);
+        _frmSerialNumber.SetSerialNumber(Integer.parseInt(serialNumber));
+
+        try {
+            channel.close();
+            connection.close();
+
+        } catch (IOException ex) {
+            Logger.getLogger(frmStandarPAck.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (TimeoutException ex) {
+            Logger.getLogger(frmStandarPAck.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+        _frmSerialNumber.setVisible(true);
+        this.dispose();
+
     }
-    
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnTest;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel6;
+    private javax.swing.JLabel jLabel7;
     private javax.swing.JLabel jlblConfirm;
     private javax.swing.JLabel jlblEmployeeName;
     private javax.swing.JLabel jlblEmployeeNumb;
@@ -1196,11 +1410,15 @@ public class frmDigitalScale extends javax.swing.JFrame {
     private javax.swing.JTextField jtxtSAPNumb;
     private javax.swing.JTextField jtxtStdarPack;
     private static javax.swing.JLabel lblCount;
+    private static javax.swing.JLabel lblCount1;
     private javax.swing.JLabel lblEmployeeId;
     private javax.swing.JLabel lblEmployeeName;
     private static javax.swing.JLabel lblNameCurrentCount;
+    private static javax.swing.JLabel lblNameCurrentCount1;
+    private static javax.swing.JLabel lblNameCurrentCount3;
+    private static javax.swing.JLabel lblNameCurrentCount4;
+    private static javax.swing.JLabel lblPesoc;
+    private static javax.swing.JLabel lblPesop;
     private javax.swing.JLabel lblSAPNum;
     // End of variables declaration//GEN-END:variables
 }
-
-

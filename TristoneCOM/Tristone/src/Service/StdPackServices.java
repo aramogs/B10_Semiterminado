@@ -8,6 +8,13 @@ package Service;
 import Entities.PrintEntity;
 import Entities.ProductsEntity;
 import Entities.StationEntity;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.sql.Blob;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,6 +22,7 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import javax.imageio.ImageIO;
 
 /**
  *
@@ -69,7 +77,8 @@ public class StdPackServices {
                 _stationEntity.setNo_estacion(rs.getString("no_estacion")); 
                 _stationEntity.setImpre(rs.getString("impre")); 
                 _stationEntity.setCancelacion(rs.getString("cancelacion"));     
-                _stationEntity.setConfimar(rs.getString("confirmar"));     
+                _stationEntity.setConfimar(rs.getString("confirmar"));
+                _stationEntity.setContainer_weight(rs.getString("peso_contenedor"));
                 _stationEntity.setEnableStation(rs.getBoolean("enable")); 
                 _stationEntity.setMysql_db(rs.getString("mysql_db")); 
             }
@@ -128,10 +137,20 @@ public class StdPackServices {
             {
                 
                 _productsEntity.setNo_sap(rs.getString("no_sap")); 
+                _productsEntity.setUnit_weight(rs.getString("unit_weight"));              
                 _productsEntity.setPcks(rs.getString("std_pack")); 
                 _productsEntity.setNo_part(rs.getString("cust_part")); 
-                _productsEntity.setDecInt(rs.getBoolean("decInt"));
+                //_productsEntity.setDecInt(rs.getBoolean("decInt"));
                 _productsEntity.setPlat(rs.getString("platform")); 
+
+                _productsEntity.setImage(rs.getBytes("hose_img"));
+                    
+                
+   
+                
+         
+                
+                
             }
             return _productsEntity;
         }catch(Exception ex){
