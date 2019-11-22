@@ -18,8 +18,10 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
+import java.io.File;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.Scanner;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.logging.Level;
@@ -45,13 +47,64 @@ public class frmSerialNumber extends javax.swing.JFrame {
     private static final String QUEUE_NAME = "workQueues";
     private Connection connection;
     private static final String EXCHANGE_NAME = "stations";
-    
+ 
+    String cancelCode = "";
+    String _cancelCode;
     public frmSerialNumber() {
         initComponents();
         
         getContentPane().setBackground(Color.DARK_GRAY);
         jtxtMessage.setEditable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        CancelConfirmCode();
+    }
+    
+    
+    private void CancelConfirmCode() {
+        String dbPath = "";
+        String dbName = "";
+        String userDB = "";
+        String passDB = "";
+        String station = "";
+        String innerPass = "";
+        String cancelCode = "";
+        String confirmCode = "";
+
+        StationEntity _stationEntity = new StationEntity();
+        StationModel objStationModel = new StationModel();
+
+        String path = new File("TristonePath.txt").getAbsolutePath();
+
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                Scanner sc = new Scanner(file);
+
+                dbPath = sc.nextLine();
+                dbName = sc.nextLine();
+                userDB = sc.nextLine();
+                passDB = sc.nextLine();
+                station = sc.nextLine();
+                innerPass = sc.nextLine();
+                
+
+                _stationEntity = objStationModel.getStationConf(station);
+                cancelCode = _stationEntity.getCancelacion();
+                confirmCode = _stationEntity.getConfimar();
+            } else {
+                jtxtMessage.setText("The File doesn't exist");
+                jtxtMessage.setBackground(Color.red);
+                jtxtMessage.setEditable(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+          
+            _cancelCode = cancelCode;
+  
+
+            System.out.println("  cancel Code'" + _cancelCode + "'");
+        }
     }
     
     public void initialize(){
@@ -74,8 +127,15 @@ public class frmSerialNumber extends javax.swing.JFrame {
     }
     
     public void SetSerialNumber(int serialNumber){
+        if(serialNumber==0){
+            jlblSerialNumber.setText("Error");
+             jtxtMessage.setText("Error");
+            jtxtMessage.setBackground(Color.red);
+            jtxtMessage.setEditable(false);
+        }else{
          jlblSerialNumber.setText("" + serialNumber);
         _serialNumber = serialNumber;
+        }
     }
     
     private void ReseteBox(){
@@ -261,6 +321,7 @@ public class frmSerialNumber extends javax.swing.JFrame {
         StationModel objStationModel =new StationModel();
         boolean connMySQL=true;
         boolean connRabbitMQ=true;
+        
         _stationEntity = objStationModel.getStationConf(_sendValidationEntity.getEstacion());
         connMySQL=false;
         ConnectionFactory factory = new ConnectionFactory();
@@ -269,6 +330,7 @@ public class frmSerialNumber extends javax.swing.JFrame {
         factory.setUsername(_stationEntity.getMq_user());
         factory.setPassword(_stationEntity.getMq_pass());
         
+
         
         try{
             connection = factory.newConnection();
@@ -494,6 +556,12 @@ public class frmSerialNumber extends javax.swing.JFrame {
                         jtxtMessage.setEditable(false);
                         ReseteBox();
                     }
+                }else if(serialNumber.equals(_cancelCode)){
+  
+                    frmEmployee _frmEmployee = new frmEmployee();
+                    this.setVisible(false);
+                    _frmEmployee.setVisible(true);
+                    
                 }else{
                     jtxtMessage.setText("Invalid Serial Number");
                     jtxtMessage.setBackground(Color.red);

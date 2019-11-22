@@ -95,7 +95,8 @@ public class frmDigitalScale extends javax.swing.JFrame {
     static String valueSP = "";
     static boolean decInt = true;
     static String valuelbl = "";
-
+    boolean confirmed;
+    
     String scanSleep = "";
     private static final String QUEUE_NAME = "workQueues";
     private static int i = 0;
@@ -106,6 +107,9 @@ public class frmDigitalScale extends javax.swing.JFrame {
     private Connection connection;
     //private Channel channel;
     DeliverCallback deliverCallback = null;
+    
+    
+
 
     public frmDigitalScale() {
         super();
@@ -124,12 +128,19 @@ public class frmDigitalScale extends javax.swing.JFrame {
         //btnSend.setText("Print");
         //btnSend.setVisible(false);
         btnTest.setVisible(false);
-        jtxtConfirm.setEnabled(false);
+        jtxtConfirm.setEnabled(true);
+        jtxtConfirm.setVisible(true);
         CancelConfirmCode();
         SetMessageText(false);
         SetMessageTextError(false);
 
+
         jLabel7.setIcon(new ImageIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Tristone.png")).getImage().getScaledInstance(120, 60, Image.SCALE_SMOOTH)));
+        
+        int inputCI = Integer.parseInt(lblCount1.getText());
+        if(inputCI==0){
+        SetMessageMore(true);
+        }
 
     }
 
@@ -553,6 +564,8 @@ public class frmDigitalScale extends javax.swing.JFrame {
             int inputSP = Integer.parseInt(lblCount.getText());
             if (inputSP > 0 && inputSP <= stdPack) { //9/05/2019 Ciscomar
                 jtxtConfirm.setEnabled(true);
+                
+
                 //jtxtConfirm.setVisible(true);
 
             } else {
@@ -563,7 +576,7 @@ public class frmDigitalScale extends javax.swing.JFrame {
         } else {
 
             double inputC = Double.parseDouble(lblCount1.getText());
-            if (inputC > 0 && inputC <= stdPack) { //9/05/2019 Ciscomar
+            if (inputC > 0 && inputC <= stdPack ) { //9/05/2019 Ciscomar
                 jtxtConfirm.setEnabled(true);
                 //jtxtConfirm.setVisible(true);
 
@@ -618,6 +631,27 @@ public class frmDigitalScale extends javax.swing.JFrame {
         }
 
     }
+    
+    private void SetMessageMore(boolean confirm) {
+        if (confirm) {
+
+            try {
+                jtxtMessage.setText("AGREGAR PIEZAS");
+                jtxtMessage.setBackground(Color.YELLOW);
+                jtxtMessage.setEditable(false);
+                jtxtConfirm.setEnabled(true);
+                jtxtConfirm.requestFocus();
+
+            } catch (Exception ex) {
+                Logger.getLogger(frmDigitalScale.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        } else {
+            jtxtMessage.setText("");
+            jtxtMessage.setBackground(Color.WHITE);
+            jtxtMessage.setEditable(false);
+        }
+
+    }
 
     private void lblCountPropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_lblCountPropertyChange
         // TODO add your handling code here: 
@@ -642,30 +676,46 @@ public class frmDigitalScale extends javax.swing.JFrame {
 
             int inputC = Integer.parseInt(lblCount1.getText());
             double inputSP = Double.parseDouble(lblCount.getText());
-            //System.out.println(inputSP);
+            double dif = Math.round(stdPack *.05);
+            double almost = stdPack-dif;
+            
             if (inputSP > 0.0 && inputSP > _containerWeight) {
                 double total = Math.round((inputSP - _containerWeight) / _weight);
                 int totalC = (int) total;
                 lblCount1.setText("" + totalC);
+                
+               
             } else {
                 lblCount1.setText("0");
+    
             }
-
-            if (inputC > 0 && inputC <= stdPack) { //9/05/2019 Ciscomar
+            
+            if (inputC > 0 && inputC <= stdPack && !confirmed && inputC<=almost) { //9/05/2019 Ciscomar 12/11/2019
+                jlblConfirm.setVisible(true);
+                jtxtConfirm.setVisible(true);
+                jtxtConfirm.setEnabled(true);
+                SetMessageMore(true);
+            }else if(inputC > 0 && inputC <= stdPack && !confirmed && inputC>almost){
                 jlblConfirm.setVisible(true);
                 jtxtConfirm.setVisible(true);
                 jtxtConfirm.setEnabled(true);
                 SetMessageText(true);
-            } else if (inputC == 0) {
-                jlblConfirm.setVisible(false);
-                jtxtConfirm.setVisible(false);
+            }else if (confirmed){ 
+                jlblConfirm.setVisible(true);
+                jtxtConfirm.setVisible(true);
                 jtxtConfirm.setEnabled(false);
+            }else if (inputC == 0) {
+                //jlblConfirm.setVisible(false);
+                //jtxtConfirm.setVisible(false);
+                //jtxtConfirm.setEnabled(false);
+                
                 SetMessageText(false);
                 SetMessageTextError(false);
+                SetMessageMore(true);
             } else {
-                jlblConfirm.setVisible(false);
-                jtxtConfirm.setVisible(false);
-                jtxtConfirm.setEnabled(false);
+                //jlblConfirm.setVisible(false);
+                //jtxtConfirm.setVisible(false);
+                //jtxtConfirm.setEnabled(false);
                 SetMessageText(false);
                 SetMessageTextError(true);
             }
@@ -678,22 +728,26 @@ public class frmDigitalScale extends javax.swing.JFrame {
 
     private void jtxtConfirmKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jtxtConfirmKeyPressed
         // TODO add your handling code here:
+         int inputCO = Integer.parseInt(lblCount1.getText());
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
             try {
                 String code = jtxtConfirm.getText();
                 if (code.equals(_cancelCode)) {
                     frmEmployee _frmEmployee = new frmEmployee();
-
+                    this.setVisible(false);
+                   // mySP.close();
+                   // this.dispose();
                     _frmEmployee.setVisible(true);
-                    //this.setVisible(false);
-                    mySP.close();
-                    this.dispose();
-                } else {
-                    if (code.equals(_confirmCode)) {
+                    
+                } else if (code.equals(_confirmCode) && inputCO>0 && inputCO<=stdPack) {
+                        confirmed=true;
                         jtxtConfirm.setEnabled(false);
                         Send(lblCount1.getText()); //9/05/2019 Ciscomar
-                    }
-                }
+                        
+                    
+                }else{
+                        jtxtConfirm.setText("");
+                        }
             } catch (Exception ex) {
                 Logger.getLogger(frmDigitalScale.class.getName()).log(Level.SEVERE, null, ex);
             }

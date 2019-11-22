@@ -26,8 +26,11 @@ import javax.swing.JOptionPane;
  * @author Ulises
  */
 public class frmScanProduct extends javax.swing.JFrame {
+    
 
     public String _idEmployee;
+    String cancelCode = "";
+    String _cancelCode;
     /**
      * Creates new form frmScanProduct
      */
@@ -38,6 +41,8 @@ public class frmScanProduct extends javax.swing.JFrame {
         //getEmployee(_idEmployee);
         jtxtMessage.setEditable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
+        CancelConfirmCode();
+        
     }
     
     /**
@@ -188,10 +193,16 @@ public class frmScanProduct extends javax.swing.JFrame {
         if(evt.getKeyCode() == KeyEvent.VK_ENTER )
         {
             String noSAP = jtxtNoSAP.getText();
+          
             if(GetData(noSAP)){
                 
-            }else
-            {
+            }else if(noSAP.equals(_cancelCode)){
+  
+                    frmEmployee _frmEmployee = new frmEmployee();
+                    this.setVisible(false);
+                    _frmEmployee.setVisible(true);
+                    
+                }else{
                 jtxtMessage.setText("Invalid Number");
                 jtxtMessage.setBackground(Color.red);                
                 jtxtMessage.setEditable(false);
@@ -293,7 +304,7 @@ public class frmScanProduct extends javax.swing.JFrame {
         String company="";
         String serialPort="";
         
-        String _cancelCode = "";
+        String cancelCode = "";
         StationEntity _stationEntity = new StationEntity();
         StationModel objStationModel =new StationModel();
         String path=new File ("TristonePath.txt").getAbsolutePath ();
@@ -317,6 +328,7 @@ public class frmScanProduct extends javax.swing.JFrame {
                     
                     _stationEntity = objStationModel.getStationConf(station);
                     result=GetBartender(_stationEntity.getMysql_db() ,noSAP);
+                  
                 }
                 else{
                     jtxtMessage.setText("The File doesn't exist"); 
@@ -331,7 +343,59 @@ public class frmScanProduct extends javax.swing.JFrame {
             return result;
         }
         finally{
+            
+            
             return result;    
+        }
+    }
+    
+    
+    
+    
+    private void CancelConfirmCode() {
+        String dbPath = "";
+        String dbName = "";
+        String userDB = "";
+        String passDB = "";
+        String station = "";
+        String innerPass = "";
+        String cancelCode = "";
+        String confirmCode = "";
+
+        StationEntity _stationEntity = new StationEntity();
+        StationModel objStationModel = new StationModel();
+
+        String path = new File("TristonePath.txt").getAbsolutePath();
+
+        File file = new File(path);
+        try {
+            if (file.exists()) {
+                Scanner sc = new Scanner(file);
+
+                dbPath = sc.nextLine();
+                dbName = sc.nextLine();
+                userDB = sc.nextLine();
+                passDB = sc.nextLine();
+                station = sc.nextLine();
+                innerPass = sc.nextLine();
+                
+
+                _stationEntity = objStationModel.getStationConf(station);
+                cancelCode = _stationEntity.getCancelacion();
+                confirmCode = _stationEntity.getConfimar();
+            } else {
+                jtxtMessage.setText("The File doesn't exist");
+                jtxtMessage.setBackground(Color.red);
+                jtxtMessage.setEditable(false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+          
+            _cancelCode = cancelCode;
+  
+
+            System.out.println("  cancel Code'" + _cancelCode + "'");
         }
     }
     
