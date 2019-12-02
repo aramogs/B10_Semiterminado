@@ -57,8 +57,8 @@ public class frmSerialNumber extends javax.swing.JFrame {
     public frmSerialNumber() {
         initComponents();
         
-        getContentPane().setBackground(Color.decode("#0275d8")); 
-        //getContentPane().setBackground(Color.DARK_GRAY); 
+        //getContentPane().setBackground(Color.decode("#0275d8")); 
+        getContentPane().setBackground(Color.DARK_GRAY); 
         //jLabel7.setVisible(false);
         jtxtMessage.setEditable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -439,7 +439,6 @@ public class frmSerialNumber extends javax.swing.JFrame {
         jtxtMessage = new javax.swing.JTextField();
         jbtnimprimir = new javax.swing.JButton();
         jbtncancelar = new javax.swing.JButton();
-        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setUndecorated(true);
@@ -514,9 +513,6 @@ public class frmSerialNumber extends javax.swing.JFrame {
             }
         });
 
-        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
-        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/recycle2.png"))); // NOI18N
-
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -536,16 +532,10 @@ public class frmSerialNumber extends javax.swing.JFrame {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
-                                .addComponent(jbtnimprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(jbtncancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                                .addGap(50, 50, 50))
-                            .addGroup(layout.createSequentialGroup()
-                                .addGap(0, 0, Short.MAX_VALUE)
-                                .addComponent(jLabel7)))
-                        .addGap(23, 23, 23))
+                        .addComponent(jbtnimprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addComponent(jbtncancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addGap(73, 73, 73))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jtxtSerialNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
@@ -575,19 +565,16 @@ public class frmSerialNumber extends javax.swing.JFrame {
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(9, 9, 9)
-                        .addComponent(jLabel7)
-                        .addGap(31, 31, 31)
+                        .addGap(98, 98, 98)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jtxtSerialNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jlblSerialNumber))
                     .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(0, 14, Short.MAX_VALUE)
+                        .addGap(0, 20, Short.MAX_VALUE)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jlblEmployeeNumb))
@@ -677,7 +664,7 @@ public class frmSerialNumber extends javax.swing.JFrame {
     private void jbtnimprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnimprimirActionPerformed
                         jbtnimprimir.setEnabled(false);
                         try {
-                            Send(getSendDataEntity("reimprimir","ensamble"));
+                            Send(getSendDataEntity("reimprimir","estampado"));
                             } catch (Exception ex) {
                         Logger.getLogger(frmSerialNumber.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -724,7 +711,6 @@ public class frmSerialNumber extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
-    private javax.swing.JLabel jLabel7;
     private javax.swing.JButton jbtncancelar;
     private javax.swing.JButton jbtnimprimir;
     private javax.swing.JLabel jlblEmployeeName;
