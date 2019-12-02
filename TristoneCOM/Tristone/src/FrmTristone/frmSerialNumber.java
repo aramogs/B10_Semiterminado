@@ -50,10 +50,16 @@ public class frmSerialNumber extends javax.swing.JFrame {
  
     String cancelCode = "";
     String _cancelCode;
+    String info_nSAP = "";
+    String  info_pckd = "";
+    String  info_dataBase = "";
+    String  info_subline = "";
     public frmSerialNumber() {
         initComponents();
         
-        getContentPane().setBackground(Color.DARK_GRAY);
+        getContentPane().setBackground(Color.decode("#0275d8")); 
+        //getContentPane().setBackground(Color.DARK_GRAY); 
+        //jLabel7.setVisible(false);
         jtxtMessage.setEditable(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
         CancelConfirmCode();
@@ -132,6 +138,9 @@ public class frmSerialNumber extends javax.swing.JFrame {
              jtxtMessage.setText("Error");
             jtxtMessage.setBackground(Color.red);
             jtxtMessage.setEditable(false);
+            jbtnimprimir.setVisible(false);
+            jbtncancelar.setVisible(false);
+            _serialNumber = serialNumber;
         }else{
          jlblSerialNumber.setText("" + serialNumber);
         _serialNumber = serialNumber;
@@ -209,14 +218,20 @@ public class frmSerialNumber extends javax.swing.JFrame {
         return _PrintEntity;
     }
     
-    private SendValidationEntity getSendDataEntity(){
+    private SendValidationEntity getSendDataEntity(String movimiento, String areaimpresion){
         SendValidationEntity _sendValidationEntity = new SendValidationEntity();
         _sendValidationEntity.setBartender(_PrintEntity.getBartender());
         _sendValidationEntity.setEmpresa(_PrintEntity.getEmpresa());
         _sendValidationEntity.setEstacion(_PrintEntity.getEstacion());
         _sendValidationEntity.setImpresoraBartender(_PrintEntity.getImpresoraBartender());
-        _sendValidationEntity.setPckd(_PrintEntity.getPckd());
+        _sendValidationEntity.setPckd(Integer.parseInt(info_pckd));
         _sendValidationEntity.setnVali(_serialNumber);
+        _sendValidationEntity.setMovimiento(movimiento);
+        _sendValidationEntity.setAreaimpresion(areaimpresion);
+        _sendValidationEntity.setSubline(info_subline);
+        _sendValidationEntity.setDataBase(info_dataBase);
+        _sendValidationEntity.setnSAP(info_nSAP);
+        
         
         return _sendValidationEntity;
     }
@@ -396,6 +411,14 @@ public class frmSerialNumber extends javax.swing.JFrame {
         _noEmployee = noEmployee;
     }
     
+    public void SetInfo(String nSAP, String pckd, String dataBase, String subline){
+        info_nSAP = nSAP;
+        info_pckd = pckd;
+        info_dataBase = dataBase;
+        info_subline = subline;
+        
+    }
+    
     /**
      * This method is called from within the constructor to initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is always
@@ -414,8 +437,12 @@ public class frmSerialNumber extends javax.swing.JFrame {
         jtxtSerialNumber = new javax.swing.JTextField();
         jlblSerialNumber = new javax.swing.JLabel();
         jtxtMessage = new javax.swing.JTextField();
+        jbtnimprimir = new javax.swing.JButton();
+        jbtncancelar = new javax.swing.JButton();
+        jLabel7 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
+        setUndecorated(true);
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
@@ -425,28 +452,28 @@ public class frmSerialNumber extends javax.swing.JFrame {
         jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/Tristone.png"))); // NOI18N
 
-        jLabel3.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
         jLabel3.setForeground(new java.awt.Color(255, 255, 255));
         jLabel3.setText("Employee ID:");
 
-        jlblEmployeeName.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jlblEmployeeName.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
         jlblEmployeeName.setForeground(new java.awt.Color(255, 255, 255));
         jlblEmployeeName.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlblEmployeeName.setText("Employee Name:");
         jlblEmployeeName.setName("jlblEmployee"); // NOI18N
 
-        jlblEmployeeNumb.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jlblEmployeeNumb.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
         jlblEmployeeNumb.setForeground(new java.awt.Color(255, 255, 255));
         jlblEmployeeNumb.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlblEmployeeNumb.setText("Employee Number:");
         jlblEmployeeNumb.setName("jlblEmployee"); // NOI18N
 
-        jLabel4.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
         jLabel4.setForeground(new java.awt.Color(255, 255, 255));
         jLabel4.setText("Employee Name:");
         jLabel4.setName(""); // NOI18N
 
-        jLabel5.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
         jLabel5.setForeground(new java.awt.Color(255, 255, 255));
         jLabel5.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel5.setText("Serial Number:");
@@ -460,7 +487,7 @@ public class frmSerialNumber extends javax.swing.JFrame {
             }
         });
 
-        jlblSerialNumber.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jlblSerialNumber.setFont(new java.awt.Font("Arial", 3, 14)); // NOI18N
         jlblSerialNumber.setForeground(new java.awt.Color(255, 255, 255));
         jlblSerialNumber.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jlblSerialNumber.setText("Serial Number");
@@ -469,60 +496,109 @@ public class frmSerialNumber extends javax.swing.JFrame {
         jtxtMessage.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
         jtxtMessage.setHorizontalAlignment(javax.swing.JTextField.CENTER);
 
+        jbtnimprimir.setBackground(new java.awt.Color(153, 153, 153));
+        jbtnimprimir.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
+        jbtnimprimir.setText("Reimprimir ");
+        jbtnimprimir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtnimprimirActionPerformed(evt);
+            }
+        });
+
+        jbtncancelar.setBackground(new java.awt.Color(153, 153, 153));
+        jbtncancelar.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
+        jbtncancelar.setText("Cancelar");
+        jbtncancelar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbtncancelarActionPerformed(evt);
+            }
+        });
+
+        jLabel7.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel7.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/recycle2.png"))); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
-                        .addGap(31, 31, 31)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                        .addComponent(jlblEmployeeNumb, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addComponent(jLabel4, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                        .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                             .addGap(37, 37, 37)
-                            .addComponent(jlblEmployeeName, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 49, Short.MAX_VALUE)
+                            .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 337, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addGroup(layout.createSequentialGroup()
+                            .addContainerGap()
+                            .addComponent(jlblEmployeeNumb, javax.swing.GroupLayout.PREFERRED_SIZE, 349, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 171, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jtxtSerialNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 218, Short.MAX_VALUE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(38, 38, 38)
-                        .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 141, Short.MAX_VALUE)
-                        .addGap(39, 39, 39))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(37, 37, 37)
-                        .addComponent(jlblSerialNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 143, Short.MAX_VALUE)
-                        .addGap(38, 38, 38)))
-                .addGap(102, 102, 102))
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.LEADING, layout.createSequentialGroup()
+                                .addComponent(jbtnimprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 156, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(jbtncancelar, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                                .addGap(50, 50, 50))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(0, 0, Short.MAX_VALUE)
+                                .addComponent(jLabel7)))
+                        .addGap(23, 23, 23))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jtxtSerialNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 290, Short.MAX_VALUE)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(38, 38, 38)
+                                .addComponent(jLabel5, javax.swing.GroupLayout.DEFAULT_SIZE, 213, Short.MAX_VALUE)
+                                .addGap(39, 39, 39))
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(37, 37, 37)
+                                .addComponent(jlblSerialNumber, javax.swing.GroupLayout.DEFAULT_SIZE, 215, Short.MAX_VALUE)
+                                .addGap(38, 38, 38)))
+                        .addGap(73, 73, 73))))
             .addComponent(jtxtMessage)
+            .addGroup(layout.createSequentialGroup()
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(85, 85, 85)
+                        .addComponent(jlblEmployeeName, javax.swing.GroupLayout.PREFERRED_SIZE, 331, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 170, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
+                .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(106, 106, 106)
+                        .addGap(9, 9, 9)
+                        .addComponent(jLabel7)
+                        .addGap(31, 31, 31)
                         .addComponent(jLabel5)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jtxtSerialNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addComponent(jlblSerialNumber))
-                    .addGroup(layout.createSequentialGroup()
-                        .addContainerGap()
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 212, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 14, Short.MAX_VALUE)
+                        .addComponent(jLabel3)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jlblEmployeeNumb))
+                    .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jbtnimprimir, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jbtncancelar, javax.swing.GroupLayout.PREFERRED_SIZE, 47, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(12, 12, 12)
                 .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 19, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jlblEmployeeName)
-                .addGap(3, 3, 3)
-                .addComponent(jLabel3)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jlblEmployeeNumb)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 35, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                 .addComponent(jtxtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
         );
 
@@ -541,7 +617,7 @@ public class frmSerialNumber extends javax.swing.JFrame {
                     result = InsertData(_PrintEntity);
                     if(result){
                         try {
-                            Send(getSendDataEntity());
+                            //Send(getSendDataEntity(""));
                             } catch (Exception ex) {
                         Logger.getLogger(frmSerialNumber.class.getName()).log(Level.SEVERE, null, ex);
                         }
@@ -556,13 +632,23 @@ public class frmSerialNumber extends javax.swing.JFrame {
                         jtxtMessage.setEditable(false);
                         ReseteBox();
                     }
-                }else if(serialNumber.equals(_cancelCode)){
+                }else if(serialNumber.equals(_cancelCode) && _serialNumber != 0){
   
-                    frmEmployee _frmEmployee = new frmEmployee();
-                    this.setVisible(false);
-                    _frmEmployee.setVisible(true);
+                    try {
+                            Send(getSendDataEntity("rackprod","e"));
+                            } catch (Exception ex) {
+                        Logger.getLogger(frmSerialNumber.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                            frmEmployee _frmEmployee = new frmEmployee();
+                            _frmEmployee.setVisible(true);
+                            this.dispose();
                     
-                }else{
+                }else if(serialNumber.equals(_cancelCode) && _serialNumber == 0){
+                     frmEmployee _frmEmployee = new frmEmployee();
+                            _frmEmployee.setVisible(true);
+                            this.dispose();
+                }
+                else{
                     jtxtMessage.setText("Invalid Serial Number");
                     jtxtMessage.setBackground(Color.red);
                     jtxtMessage.setEditable(false);
@@ -576,6 +662,27 @@ public class frmSerialNumber extends javax.swing.JFrame {
         this.dispose();
         // TODO add your handling code here:
     }//GEN-LAST:event_formWindowClosing
+
+    private void jbtncancelarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtncancelarActionPerformed
+                        try {
+                            Send(getSendDataEntity("rackprod",""));
+                            } catch (Exception ex) {
+                        Logger.getLogger(frmSerialNumber.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                            frmEmployee _frmEmployee = new frmEmployee();
+                            _frmEmployee.setVisible(true);
+                            this.dispose();
+    }//GEN-LAST:event_jbtncancelarActionPerformed
+
+    private void jbtnimprimirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbtnimprimirActionPerformed
+                        jbtnimprimir.setEnabled(false);
+                        try {
+                            Send(getSendDataEntity("reimprimir","ensamble"));
+                            } catch (Exception ex) {
+                        Logger.getLogger(frmSerialNumber.class.getName()).log(Level.SEVERE, null, ex);
+                        }
+                            
+    }//GEN-LAST:event_jbtnimprimirActionPerformed
 
     /**
      * @param args the command line arguments
@@ -617,6 +724,9 @@ public class frmSerialNumber extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel7;
+    private javax.swing.JButton jbtncancelar;
+    private javax.swing.JButton jbtnimprimir;
     private javax.swing.JLabel jlblEmployeeName;
     private javax.swing.JLabel jlblEmployeeNumb;
     private javax.swing.JLabel jlblSerialNumber;
