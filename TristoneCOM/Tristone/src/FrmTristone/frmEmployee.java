@@ -18,6 +18,7 @@ import java.util.TimerTask;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
+import javax.swing.WindowConstants;
 
 
 /**
@@ -31,17 +32,26 @@ public class frmEmployee extends javax.swing.JFrame {
      */
     
     
+
+
+
+    
     public frmEmployee()  {
         initComponents();
-        
-        getContentPane().setBackground(Color.DARK_GRAY);
+        getContentPane().setBackground(Color.decode("#0275d8"));
+        //jLabel3.setVisible(false);
+        //getContentPane().setBackground(Color.DARK_GRAY); 
          //this.setUndecorated(true);
         jtxtMessage.setEditable(false);
         jbtnSendEmployee.setVisible(false);
         this.setExtendedState(JFrame.MAXIMIZED_BOTH);
             //jLabel2.setBackground(Color.white);
         
+
+       //setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE) ;
     }
+    
+
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -61,6 +71,7 @@ public class frmEmployee extends javax.swing.JFrame {
         jLabel2 = new javax.swing.JLabel();
         jtxtMessage = new javax.swing.JTextField();
         jlblSettings = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setBackground(new java.awt.Color(255, 255, 255));
@@ -91,7 +102,7 @@ public class frmEmployee extends javax.swing.JFrame {
 
         label2.setText("label2");
 
-        jLabel2.setFont(new java.awt.Font("Arial", 1, 18)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Arial", 3, 18)); // NOI18N
         jLabel2.setForeground(new java.awt.Color(255, 255, 255));
         jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         jLabel2.setText("Employee Number");
@@ -108,6 +119,9 @@ public class frmEmployee extends javax.swing.JFrame {
             }
         });
 
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.TRAILING);
+        jLabel3.setIcon(new javax.swing.ImageIcon(getClass().getResource("/img/recycle2.png"))); // NOI18N
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
@@ -115,12 +129,22 @@ public class frmEmployee extends javax.swing.JFrame {
             .addGroup(layout.createSequentialGroup()
                 .addGap(31, 31, 31)
                 .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 344, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
-                    .addComponent(jbtnSendEmployee, javax.swing.GroupLayout.Alignment.TRAILING)
-                    .addComponent(jtxtEmployeeNumber, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(91, 91, 91))
+                    .addGroup(layout.createSequentialGroup()
+                        .addGap(0, 132, Short.MAX_VALUE)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jbtnSendEmployee)
+                                .addGap(91, 91, 91))
+                            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                                .addComponent(jLabel3)
+                                .addGap(21, 21, 21))))
+                    .addGroup(layout.createSequentialGroup()
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 231, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jtxtEmployeeNumber, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, 221, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addContainerGap())))
             .addComponent(jtxtMessage)
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jlblSettings)
@@ -129,19 +153,21 @@ public class frmEmployee extends javax.swing.JFrame {
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(layout.createSequentialGroup()
-                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                .addGap(17, 17, 17)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(25, 25, 25)
-                        .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 189, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 96, Short.MAX_VALUE)
-                        .addComponent(jlblSettings)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(104, 104, 104)
+                        .addComponent(jLabel3)
+                        .addGap(80, 80, 80)
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jtxtEmployeeNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                        .addComponent(jtxtEmployeeNumber, javax.swing.GroupLayout.PREFERRED_SIZE, 31, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 12, Short.MAX_VALUE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+                        .addComponent(jlblSettings)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED))
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                         .addComponent(jbtnSendEmployee)
                         .addGap(72, 72, 72)))
                 .addComponent(jtxtMessage, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
@@ -303,10 +329,20 @@ public class frmEmployee extends javax.swing.JFrame {
             try{
                 boolean result= obj.EmployeeExist(jtxtEmployeeNumber.getText());
                 if(result){
-                    frmScanProduct _frmScanProduct = new frmScanProduct();
-                    //_frmScanProduct._idEmployee=  Integer.parseInt(jtxtEmployeeNumber.getText());
-                    _frmScanProduct.getEmployee(jtxtEmployeeNumber.getText());
-                    _frmScanProduct.setVisible(true);
+                    
+                    //Stamping
+                    //frmScanProduct _frmScanProduct = new frmScanProduct();
+                    //_frmScanProduct.getEmployee(jtxtEmployeeNumber.getText());
+                    //_frmScanProduct.setVisible(true);
+                    //Stamping
+                    
+                    //Return
+                    frmMovement _frmMovement = new frmMovement();
+                    _frmMovement.getEmployee(jtxtEmployeeNumber.getText());
+                    _frmMovement.setVisible(true);
+                    //Return
+                    
+                    //_frmScanProduct._idEmployee=  Integer.parseInt(jtxtEmployeeNumber.getText());                  
                     //this.setVisible(false);                    
                   
                     this.dispose();
@@ -370,6 +406,7 @@ public class frmEmployee extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JButton jbtnSendEmployee;
     private javax.swing.JLabel jlblSettings;
     private javax.swing.JTextField jtxtEmployeeNumber;
